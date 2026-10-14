@@ -122,6 +122,19 @@ p.v:first-of-type:not(:has(sup))::first-letter{font-size:3.2em;float:left;line-h
 .bar{height:6px;background:var(--line);border-radius:9px;margin:14px 0 2px;overflow:hidden}.bar i{display:block;height:100%;background:var(--acc);transition:width .3s}
 .refs{display:flex;flex-wrap:wrap;gap:6px}mark{background:var(--hl1);color:inherit;border-radius:3px;padding:0 2px}
 @media(max-width:900px){.shell,.shell.lc{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}aside{flex-direction:row;flex-wrap:wrap;padding:10px;align-items:center;gap:4px}.brand{display:none}.nav{width:auto;padding:8px 12px;font-size:15px}.nav span{display:none}.sp{display:none}.pal{display:none}.cyc{display:grid;margin:0 0 0 auto;width:36px;height:36px}#tl{display:none}.rp{position:fixed;left:0;right:0;bottom:0;width:100%;max-height:62vh;z-index:8;border:0;border-top:1px solid var(--line);border-radius:20px 20px 0 0;box-shadow:0 -8px 30px #0004;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px))}.rp.c{display:none}.top,.scroll{padding-left:18px;padding-right:18px}}
+.tx{display:contents}.tmb,.cls,.mtog{display:none}
+@media(max-width:900px){
+.top{flex-wrap:wrap;gap:6px;padding-top:8px;padding-bottom:8px;max-height:260px;overflow:hidden;transition:max-height .22s,padding .22s,border-color .22s}
+.top.hide{max-height:0;padding-top:0;padding-bottom:0;border-color:transparent}
+.top h2{font-size:20px}.ttl{cursor:pointer}.ttl::after{content:" \25BE";font-size:.7em;opacity:.7}
+.tmb{display:grid}#tg2{display:none}
+.tx{display:none;flex:1 0 100%;align-items:center;gap:8px;flex-wrap:wrap}.top.xo .tx{display:flex}
+.cls{display:inline-flex;float:right}.mtog{display:flex;margin-top:10px;width:100%;justify-content:center}
+.rp:not(.mo) .more{display:none}
+.rp{max-height:none;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px))}
+.rp.mo{max-height:55vh}.rp.pk{max-height:70vh}
+.shell.hs .scroll{padding-bottom:170px}
+}
 </style><script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){})}</script>
 </head>
 <body>
@@ -151,8 +164,9 @@ try{const s=JSON.parse(localStorage.getItem('bib-lib')||'[]');S.items.push(...s)
 try{const v=localStorage.getItem('bib-ver');if(v&&S.items.some(i=>i.id===v))S.ver=v}catch(e){}
 try{S.plans=JSON.parse(localStorage.getItem('bib-plans')||'{}')}catch(e){S.plans={}}
 try{const u=JSON.parse(localStorage.getItem('bib-user')||'{}');['hl','bm','notes'].forEach(k=>{if(u[k])S[k]=u[k]});if(u.fs)S.fs=u.fs;if(u.vm!==undefined)S.vm=u.vm;S.cont=!!u.cont;S.para=!!u.para;if(u.b>=0&&u.b<66){S.b=u.b;S.c=u.c||1}document.documentElement.style.setProperty('--fs',S.fs+'px')}catch(e){}
+try{if(matchMedia('(max-width:900px)').matches&&!localStorage.getItem('bib-m2')){S.cont=true;localStorage.setItem('bib-m2','1')}}catch(e){}
 const persist=()=>{try{localStorage.setItem('bib-user',JSON.stringify({hl:S.hl,bm:S.bm,notes:S.notes,fs:S.fs,vm:S.vm,b:S.b,c:S.c,cont:S.cont,para:S.para}))}catch(e){}};
-function layout(){$('.shell').classList.toggle('para',!!(S.para&&S.tab==='read'));$('.shell').classList.toggle('two',!!(S.lc&&S.rc&&S.tab==='read'&&innerWidth>900))}
+function layout(){$('.shell').classList.toggle('hs',S.sel!==null&&S.tab==='read'&&!S.rc);$('.shell').classList.toggle('para',!!(S.para&&S.tab==='read'));$('.shell').classList.toggle('two',!!(S.lc&&S.rc&&S.tab==='read'&&innerWidth>900))}
 let LK='',DT;const SC={};
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
 if(!S.items.some(i=>i.id===S.ver)){const f=S.items.find(i=>i.kind==='tr');S.ver=f?f.id:null}
@@ -310,7 +324,7 @@ function side(){
 }
 function topbar(){
  const t=$('#tp');
- if(S.tab==='read')t.innerHTML=`<h2>${BOOKS[S.b].n} ${S.c}</h2><select class="sel" id="vs">${trs().map(i=>`<option value="${i.id}" ${i.id===S.ver?'selected':''}>${esc(i.name)}</option>`).join('')}</select><button class="btn ${S.para?'p':''}" id="pg" title="Paragraph reading" aria-pressed="${!!S.para}">¶</button><button class="btn" id="ct" title="Switch between chapter and whole-book reading" aria-pressed="${!!S.cont}">${S.cont?'Chapter':'Book'}</button><button class="btn" id="fd">A−</button><button class="btn" id="fu">A+</button>`;
+ if(S.tab==='read')t.innerHTML=`<h2 id="ttl" class="ttl">${BOOKS[S.b].n} ${S.c}</h2><button class="ibt tmb" id="tm" title="More options">⋯</button><div class="tx"><select class="sel" id="vs">${trs().map(i=>`<option value="${i.id}" ${i.id===S.ver?'selected':''}>${esc(i.name)}</option>`).join('')}</select><button class="btn ${S.para?'p':''}" id="pg" title="Paragraph reading" aria-pressed="${!!S.para}">¶</button><button class="btn" id="ct" title="Switch between chapter and whole-book reading" aria-pressed="${!!S.cont}">${S.cont?'Chapter':'Book'}</button><button class="btn" id="fd">A−</button><button class="btn" id="fu">A+</button></div>`;
  else if(S.tab==='lib')t.innerHTML=`<h2>Bibles & More</h2><button class="btn p" onclick="$('#fi').click()">Add files</button>`;
  else if(S.tab==='ex')t.innerHTML=S.exOpen?`<h2>${esc(exTitle())}</h2><button class="btn" id="exb">All texts</button><button class="btn" id="fd">A−</button><button class="btn" id="fu">A+</button>`:`<h2>Extra-Biblical</h2><button class="btn p" onclick="$('#fi').click()">Add texts</button>`;
  else t.innerHTML=`<h2>${TITLES[S.tab]}</h2>`;
@@ -319,6 +333,9 @@ function topbar(){
  if($('#exb'))$('#exb').onclick=()=>{S.exOpen=null;render()};
  $('#tl').onclick=()=>{S.lc=!S.lc;$('.shell').classList.toggle('lc',S.lc);layout()};
  if($('#tg2'))$('#tg2').onclick=()=>{S.rc=!S.rc;$('#rp').classList.toggle('c',S.rc);layout()};
+ if($('#ttl'))$('#ttl').onclick=()=>{if(innerWidth<=900){S.sel=null;S.rc=!S.rc;render()}};
+ if($('#tm'))$('#tm').onclick=()=>{S.tx=!S.tx;t.classList.toggle('xo',S.tx)};
+ t.classList.toggle('xo',!!S.tx);if(S.tab!=='read')t.classList.remove('hide');
  if($('#vs'))$('#vs').onchange=e=>{S.ver=e.target.value;toast('Switched translation');render()};
  if($('#fd')){$('#fd').onclick=()=>fz(-1);$('#fu').onclick=()=>fz(1)}
   if($('#ct'))$('#ct').onclick=()=>{S.cont=!S.cont;render()};
@@ -333,7 +350,7 @@ function contReader(){const bk=BOOKS[S.b],cs=act()[S.b].c;
  let h=`<div class="col">${todayBar()}<div class="chap" style="padding-bottom:0">${lamb(150)}<small style="margin-top:14px">${verName()}</small><h1>${bk.n}</h1></div><div class="orn"><i></i><b></b><i></i></div>`;
  cs.forEach((ch,i)=>{const n=i+1;h+=`<div class="chap" id="ch${n}" style="padding:22px 0 0"><h1 style="font-size:40px">${n}</h1></div>${ch.t?`<div class="sum">${ch.t}</div>`:''}${ch.a?`<div class="sum">${ch.a}</div>`:''}`;h+=vlist(ch.v,n)});
  h+=`<div class="pn"><button class="btn" id="pv" aria-label="Previous book" ${S.b===0?'disabled style="opacity:.4"':''}>${ic('l')}</button><button class="btn" id="nx" ${S.b===65?'disabled style="opacity:.4"':''}>Next book</button></div></div>`;
- return `<div class="scroll" id="sc">${h}</div><div class="rp ${S.rc?'c':''}" id="rp">${rpanel()}</div>`}
+ return `<div class="scroll" id="sc">${h}</div><div class="rp ${S.rc?'c':''} ${S.sel===null?'pk':S.more?'mo':''}" id="rp">${rpanel()}</div>`}
 function reader(){
  if(!act())return emptyRead();
   if(S.cont)return contReader();
@@ -343,16 +360,16 @@ function reader(){
  h+=vlist(vs,S.c);
  if(!vs.length)h+='<div class="empty">No text for this chapter in this translation.</div>';
  h+=`<div class="pn"><button class="btn" id="pv" aria-label="Previous chapter" ${S.b===0&&S.c===1?'disabled style="opacity:.4"':''}>${ic('l')}</button><button class="btn" id="nx" ${S.b===65&&S.c===22?'disabled style="opacity:.4"':''}>Next chapter</button></div></div>`;
- return `<div class="scroll" id="sc">${h}</div><div class="rp ${S.rc?'c':''}" id="rp">${rpanel()}</div>`;
+ return `<div class="scroll" id="sc">${h}</div><div class="rp ${S.rc?'c':''} ${S.sel===null?'pk':S.more?'mo':''}" id="rp">${rpanel()}</div>`;
 }
 function rpanel(){
  if(S.sel!==null){const k=key(S.sel),ch=chData(),e=(ch&&ch.v.find(x=>x[0]===S.sel))||[],nts=e[2]||[],xr=e[3]||[];
   return `<h3 style="margin-top:0">${BOOKS[S.b].n} ${S.c}:${vlabel(selv())}</h3><div class="sws">${[['h1','var(--hl1)'],['h2','var(--hl2)'],['h3','var(--hl3)'],['h4','transparent']].map(([c,b])=>`<button class="sw" data-h="${c}" style="background:${b}">${c==='h4'?'<u>U</u>':''}</button>`).join('')}<button class="sw" data-h="">∅</button></div>
   <div class="tools"><button data-a="bm">${ic('bm')}${S.bm[k]?'Unmark':'Bookmark'}</button><button data-a="note">${ic('pen')}Note</button><button data-a="copy">${ic('cp')}Copy</button><button data-a="x">${ic('x')}Done</button></div>
-  <h3>Note</h3><textarea id="nt" rows="4" placeholder="Write a note…" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;font:inherit;font-size:16px;color:var(--ink);outline:0">${esc(S.notes[k]||'')}</textarea>`+
-  (act()?`<h3>Margin notes</h3>${nts.length?nts.map(t=>`<div class="card res" style="padding:12px;font-size:16px;line-height:1.5">${t}</div>`).join(''):'<div class="note">No margin notes on this verse.</div>'}<h3>Cross references</h3>${xr.length?`<div class="refs">${xr.map(x=>`<span class="tag">${x}</span>`).join('')}</div>`:'<div class="note">None listed.</div>'}`:'')}
+  <button class="btn mtog" data-a="more">${S.more?'Hide notes':'Note & references'}</button><div class="more"><h3>Note</h3><textarea id="nt" rows="4" placeholder="Write a note…" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;font:inherit;font-size:16px;color:var(--ink);outline:0">${esc(S.notes[k]||'')}</textarea>`+
+  (act()?`<h3>Margin notes</h3>${nts.length?nts.map(t=>`<div class="card res" style="padding:12px;font-size:16px;line-height:1.5">${t}</div>`).join(''):'<div class="note">No margin notes on this verse.</div>'}<h3>Cross references</h3>${xr.length?`<div class="refs">${xr.map(x=>`<span class="tag">${x}</span>`).join('')}</div>`:'<div class="note">None listed.</div>'}`:'')+'</div>'}
  const bl=(a,b)=>BOOKS.slice(a,b).map((x,j)=>`<button class="bk ${a+j===S.b?'on':''}" data-b="${a+j}">${x.n}<span>${x.c}</span></button>`).join('');
- return `<h3 style="margin-top:0">Chapters</h3><div class="grid">${Array.from({length:BOOKS[S.b].c},(_,k)=>`<button data-c="${k+1}" class="${k+1===S.c?'on':''}">${k+1}</button>`).join('')}</div><h3>Old Testament</h3>${bl(0,39)}<h3>New Testament</h3>${bl(39,66)}`;
+ return `<button class="btn cls" data-a="x">Close</button><h3 style="margin-top:0">Chapters</h3><div class="grid">${Array.from({length:BOOKS[S.b].c},(_,k)=>`<button data-c="${k+1}" class="${k+1===S.c?'on':''}">${k+1}</button>`).join('')}</div><h3>Old Testament</h3>${bl(0,39)}<h3>New Testament</h3>${bl(39,66)}`;
 }
 function search(){return `<div class="scroll"><div class="col"><div class="search">${ic('search')}<input id="q" placeholder="Search the active translation…" autocomplete="off"></div><div id="sr"></div></div></div>`}
 function marks(){
@@ -486,7 +503,8 @@ function render(){try{localStorage.setItem('bib-ver',S.ver)}catch(e){}
    if(e.shiftKey&&S.sel!==null){const a=Math.min(S.sel,v),z=Math.max(S.sel,v),ex=chData().v.map(x=>x[0]);S.ex2=ex.filter(i=>i>=a&&i<=z&&i!==S.sel)}
    else if(cur.includes(v)){const r=cur.filter(x=>x!==v);S.sel=r.length?r[0]:null;S.ex2=r.slice(1)}
    else{const all=[...cur,v].sort((x,y)=>x-y);S.sel=all[0];S.ex2=all.slice(1)}
-   if(S.sel!==null&&innerWidth<=900)S.rc=false;render()};p.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();p.click()}}});
+   if(innerWidth<=900)S.rc=S.sel===null;if(S.sel===null)S.more=false;render()};p.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();p.click()}}});
+  const sc1=$('#sc');if(sc1&&innerWidth<=900){let ly=sc1.scrollTop,lt=0;sc1.addEventListener('scroll',()=>{const y=sc1.scrollTop,d=y-ly;if(Date.now()-lt<300||Math.abs(d)<12)return;const tp=$('#tp');if(d>0&&y>80&&S.sel===null&&!tp.classList.contains('hide')){tp.classList.add('hide');S.tx=false;tp.classList.remove('xo');lt=Date.now()}else if(d<0&&tp.classList.contains('hide')){tp.classList.remove('hide');lt=Date.now()}ly=y},{passive:true})}
   $('#pv').onclick=()=>step(-1);$('#nx').onclick=()=>step(1);
   $('#bd').querySelectorAll('[data-td]').forEach(b=>b.onclick=()=>toggleDone(...b.dataset.td.split('|')));
   const sc0=$('#sc');if(S.cont&&sc0){let tk=0;sc0.onscroll=()=>{if(tk)return;tk=requestAnimationFrame(()=>{tk=0;if(S.sel!==null)return;let n=1;sc0.querySelectorAll('.chap[id^=ch]').forEach(h=>{if(h.offsetTop-sc0.offsetTop<=sc0.scrollTop+90)n=+h.id.slice(2)});if(n!==S.c){S.c=n;const t=$('#tp h2');if(t)t.textContent=BOOKS[S.b].n+' '+n;document.querySelectorAll('#rp [data-c]').forEach(b=>b.classList.toggle('on',+b.dataset.c===n));persist()}})}}
@@ -495,7 +513,7 @@ function render(){try{localStorage.setItem('bib-ver',S.ver)}catch(e){}
   rp.querySelectorAll('[data-b]').forEach(b=>b.onclick=()=>{S.b=+b.dataset.b;S.c=1;S.sel=null;render()});
   rp.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{S.c=+b.dataset.c;S.sel=null;if(S.cont)S.jump=S.c;if(innerWidth<=900)S.rc=true;render()});
   rp.querySelectorAll('[data-h]').forEach(b=>b.onclick=()=>{selv().forEach(v=>{const k=key(v);b.dataset.h?S.hl[k]=b.dataset.h:delete S.hl[k]});render()});
-  rp.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const k=key(S.sel),a=b.dataset.a;
+  rp.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const k=key(S.sel),a=b.dataset.a;if(a==='more'){S.more=!S.more;render();return}
    if(a==='bm'){const vs=selv(),all=vs.every(v=>S.bm[key(v)]);vs.forEach(v=>all?delete S.bm[key(v)]:S.bm[key(v)]=1)}
    if(a==='note'){const t=$('#nt').value.trim();t?S.notes[k]=t:delete S.notes[k];toast('Note saved')}
    if(a==='copy'){const vs=selv();try{navigator.clipboard.writeText(vs.map(v=>(vs.length>1?v+' ':'')+verseText(S.b,S.c,v)).join(' ').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')+' — '+BOOKS[S.b].n+' '+S.c+':'+vlabel(vs))}catch(e){}toast('Copied')}
