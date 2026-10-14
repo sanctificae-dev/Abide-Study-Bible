@@ -1,0 +1,27 @@
+{
+  "name": "Abide Study Bible",
+  "short_name": "Abide",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#432818",
+  "theme_color": "#432818",
+  "icons": [{
+  "name": "Abide Study Bible",
+  "short_name": "Abide",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#432818",
+  "theme_color": "#432818",
+  "icons": [
+    { "src": "agnusdei.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "agnusdei.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "agnusdei.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
+    { "src": "agnusdei.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "agnusdei.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "agnusdei.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
