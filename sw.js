@@ -6,7 +6,7 @@ self.addEventListener('fetch', e => {
       !u.pathname.startsWith('/Abide-Study-Bible/')) return;
   e.respondWith(
     fetch(e.request)
-      .then(r => { const c = r.clone(); caches.open('abide-v1').then(x => x.put(e.request, c)); return r; })
+      .then(r => { if (!r.ok) return r; const c = r.clone(); caches.open('abide-v1').then(x => x.put(e.request, c)); return r; })
       .catch(() => caches.match(e.request))
   );
 });
