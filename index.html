@@ -167,6 +167,12 @@ p.v:first-of-type:not(:has(sup))::first-letter{font-size:3.2em;float:left;line-h
 .cmp{display:flex;gap:8px;align-items:flex-end;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line)}
 .cmp textarea{flex:1;resize:none;max-height:140px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:10px 14px;font:inherit;font-size:17px;color:var(--ink);outline:0}
 .sb{display:none}
+.av{overflow:hidden}.av img{width:100%;height:100%;object-fit:cover;display:block}
+.avb{border-radius:50%;flex:none;position:relative;cursor:pointer}.sme .av{width:56px;height:56px;font-size:24px}
+.chead{position:relative}
+.pop{position:absolute;right:16px;top:54px;background:var(--bg);border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 24px #0004;padding:6px;z-index:5;min-width:180px}
+.pop button{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:10px;font-size:16px}.pop button:hover{background:var(--line)}
+.btn.dg{background:#8b1a1a;color:#fff;border-color:#8b1a1a}
 .shm{position:fixed;inset:0;background:#0007;display:grid;place-items:center;z-index:30;padding:16px}
 .shc{background:var(--bg);border:1px solid var(--line);border-radius:20px;padding:22px;width:min(420px,100%);max-height:86vh;overflow-y:auto}
 .vcard{display:flex;flex-direction:column;gap:6px}.vcard .rf{font-size:.95em;letter-spacing:.04em}
@@ -358,7 +364,7 @@ function side(){
  $('#sd').innerHTML=`<div class="brand">${lamb(96)}<h4>Abide</h4></div>`+
  NAV.map(([k,i,l])=>`<button class="nav ${S.tab===k?'on':''}" data-t="${k}" aria-label="${l}" title="${l}">${ic(i)}<span>${l}</span>${k==='soc'&&socBadge()?`<b class="bdg">${socBadge()}</b>`:''}</button>`).join('')+
  `<div class="sp"></div><div class="pal">${THEMES.map(([k,l,c])=>`<button data-th="${k}" class="${theme()===k?'on':''}"><span class="sws3">${c.map(x=>`<b style="background:${x}"></b>`).join('')}</span>${l}</button>`).join('')}</div><button class="cyc" id="cy" title="Change palette">${ic('pal')}</button>`;
- document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>{S.tab=b.dataset.t;S.sel=null;S.open=null;render()});
+ document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>{if(S.sel!==null)S.pick={b:S.b,c:S.c,vs:selv()};S.tab=b.dataset.t;S.sel=null;S.open=null;render()});
  document.querySelectorAll('[data-th]').forEach(b=>b.onclick=()=>setTheme(b.dataset.th));
  $('#cy').onclick=()=>{const i=THEMES.findIndex(x=>x[0]===theme());setTheme(THEMES[(i+1)%THEMES.length][0])};
 }
@@ -600,7 +606,7 @@ async function socConnect(){
  SOC.busy=false;socRefresh()}
 function socWatch(){const d=SOC.db,u=SOC.uid;
  socSub('me',()=>d.on('users/'+u,v=>{SOC.me=v;socRefresh();if(S.tab==='plan')render()}));
- socSub('inbox',()=>d.on('inbox/'+u,v=>{SOC.reqs=v||{};socRefresh()}));
+ socSub('inbox',()=>d.on('inbox/'+u,v=>{SOC.reqs=v||{};Object.keys(SOC.reqs).forEach(f=>socSub('ru:'+f,()=>d.on('users/'+f,x=>{SOC.users[f]=x;socRefresh()})));Object.keys(SOC.subs).forEach(k=>{if(k.startsWith('ru:')&&!SOC.reqs[k.slice(3)])socUnsub(k)});socRefresh()}));
  socSub('friends',()=>d.on('friends/'+u,v=>{SOC.friends=v||{};socSync();SOC.loaded=true;socRefresh();if(S.tab==='plan')render()}));socPublish()}
 function socSync(){const d=SOC.db,u=SOC.uid,F=SOC.friends;
  Object.keys(F).forEach(f=>{
@@ -656,18 +662,18 @@ function socLeft(){
  if(!SOC.me)return banner+`<div class="card"><h3 style="margin-top:0">Welcome</h3><div class="note" style="margin:0 0 10px">Choose the name your friends will see. You’ll get a private code to share.</div><div class="search"><input id="snm" maxlength="30" placeholder="Your name" autocomplete="off"></div><button class="btn p" id="scr">Create my code</button>${SOC.note?`<div class="note">${esc(SOC.note)}</div>`:''}</div>${signCard()}`;
  const F=Object.entries(SOC.friends).sort((a,b)=>(b[1].st==='ok')-(a[1].st==='ok')||((SOC.last[b[0]]&&SOC.last[b[0]].ts)||0)-((SOC.last[a[0]]&&SOC.last[a[0]].ts)||0));
  const R=Object.entries(SOC.reqs);
- return banner+`<div class="card"><div class="sme"><div class="av">${initial(SOC.me.name)}</div>${SOC.ed?`<div class="search" style="margin:0;flex:1"><input id="sn" maxlength="30" value="${esc(SOC.me.name)}"></div><button class="btn p" data-s="rs">Save</button>`:`<div><b>${esc(SOC.me.name)}</b><button class="lnk" data-s="rn">Rename</button></div>`}</div>
+ return banner+`<div class="card"><div class="sme"><button class="avb" id="spicb" title="Change photo" aria-label="Change photo">${avFor(SOC.uid)}</button>${SOC.ed?`<div class="search" style="margin:0;flex:1"><input id="sn" maxlength="30" value="${esc(SOC.me.name)}"></div><button class="btn p" data-s="rs">Save</button>`:`<div><b>${esc(SOC.me.name)}</b><button class="lnk" data-s="rn">Rename</button><button class="lnk" data-s="ph">${picOk(SOC.me.pic)?'Change photo':'Add photo'}</button>${picOk(SOC.me.pic)?'<button class="lnk" data-s="rp">Remove photo</button>':''}</div>`}</div>
  <small style="color:var(--muted)">Your friend code</small><div class="code">${fmtCode(SOC.me.code)}</div>
  <div class="srow"><button class="btn" data-s="cc">${ic('cp')} Copy</button>${SOC.nc?'<button class="btn p" data-s="nc2">Yes, replace it</button><button class="btn" data-s="nc0">Cancel</button>':'<button class="btn" data-s="nc1">New code</button>'}</div>
- ${SOC.nc?'<div class="note">Your current code will stop working. Existing friends are not affected.</div>':''}</div>
+ ${SOC.nc?'<div class="note">Your current code will stop working. Existing friends are not affected.</div>':''}${acctLine()}</div>
  <h3>Add a friend</h3><div class="search"><input id="sa" placeholder="Their code, e.g. ABCD-2345" autocomplete="off" autocapitalize="characters" maxlength="12"></div><button class="btn p" id="sadd">Send request</button>${SOC.note?`<div class="note">${esc(SOC.note)}</div>`:''}
- ${R.length?`<h3>Requests (${R.length})</h3>`+R.map(([f,r])=>`<div class="rq"><div class="av">${initial(r.name)}</div><div class="fm">${esc(r.name||'Someone')}<br><small style="color:var(--muted)">wants to be friends</small></div><button class="btn p" data-acc="${f}">Accept</button><button class="btn" data-dec="${f}">Decline</button><button class="lnk" data-blk="${f}">Block</button></div>`).join(''):''}
+ ${R.length?`<h3>Requests (${R.length})</h3>`+R.map(([f,r])=>`<div class="rq">${avFor(f,r.name)}<div class="fm">${esc(r.name||'Someone')}<br><small style="color:var(--muted)">wants to be friends</small></div><button class="btn p" data-acc="${f}">Accept</button><button class="btn" data-dec="${f}">Decline</button><button class="lnk" data-blk="${f}">Block</button></div>`).join(''):''}
  <h3>Friends (${F.filter(x=>x[1].st==='ok').length})</h3>
- ${F.length?F.map(([f,x])=>{const nm=socName(f),l=SOC.last[f];return x.st==='ok'?`<button class="frow ${SOC.cur===f?'on':''}" data-f="${f}"><div class="av">${initial(nm)}</div><div class="fm"><b>${esc(nm)}</b><small>${l?(l.f===SOC.uid?'You: ':'')+esc(l.t||''):'No messages yet'}</small></div>${unread(f)?'<span class="ud" title="Unread"></span>':''}</button>`:`<div class="frow"><div class="av">${initial(nm)}</div><div class="fm"><b>${esc(nm)}</b><small>Request sent, waiting for them</small></div><button class="lnk" data-cx="${f}">Cancel</button></div>`}).join(''):'<div class="empty" style="padding:18px 0">No friends yet. Share your code, or enter a friend’s above.</div>'}${acctCard()}`}
+ ${F.length?F.map(([f,x])=>{const nm=socName(f),l=SOC.last[f];return x.st==='ok'?`<button class="frow ${SOC.cur===f?'on':''}" data-f="${f}">${avFor(f)}<div class="fm"><b>${esc(nm)}</b><small>${l?(l.f===SOC.uid?'You: ':'')+esc(l.t||''):'No messages yet'}</small></div>${unread(f)?'<span class="ud" title="Unread"></span>':''}</button>`:`<div class="frow">${avFor(f)}<div class="fm"><b>${esc(nm)}</b><small>Request sent, waiting for them</small></div><button class="lnk" data-cx="${f}">Cancel</button></div>`}).join(''):'<div class="empty" style="padding:18px 0">No friends yet. Share your code, or enter a friend’s above.</div>'}${acctCard()}`}
 function socRight(){
  if(!SOC.cur||!SOC.friends[SOC.cur])return `<div class="empty" style="margin:auto">${lamb(110)}<br><br>Choose a friend to start talking.<div class="note" style="justify-content:center">${ic('lock')}<span>${SOC.mode==='preview'?'Preview messages stay on this device.':'Messages are stored on the chat server. Your Bible files are never uploaded.'}</span></div></div>`;
  const nm=socName(SOC.cur);
- return `<div class="chead"><button class="ibt sb" id="sback" title="Back">${ic('l')}</button><div class="av">${initial(nm)}</div><b>${esc(nm)}</b><button class="btn" id="sdel">Remove</button><button class="btn" id="sblk">Block</button></div><div class="smsgs" id="smsgs"></div><div class="cmp"><button class="ibt" id="sref" title="Insert the verse you have selected">${ic('read')}</button><textarea id="sin" rows="1" maxlength="1000" placeholder="Message…"></textarea><button class="btn p" id="ssend" title="Send">${ic('snd')}</button></div>`}
+ return `<div class="chead"><button class="ibt sb" id="sback" title="Back">${ic('l')}</button>${avFor(SOC.cur)}<b>${esc(nm)}</b><button class="ibt" id="smenu" title="More options" aria-haspopup="true" aria-label="More options">⋯</button></div><div class="smsgs" id="smsgs"></div><div class="cmp"><button class="ibt" id="sref" title="Insert the verse you last selected (or the chapter you’re reading)">${ic('read')}</button><textarea id="sin" rows="1" maxlength="1000" placeholder="Message…"></textarea><button class="btn p" id="ssend" title="Send">${ic('snd')}</button></div>`}
 function social(){if(!SOC.ready&&!SOC.busy&&!SOC.err)socConnect();return `<div class="soc ${SOC.cur?'co':''}" id="soc"><div class="soc-l" id="sl">${socLeft()}</div><div class="soc-r" id="sr">${socRight()}</div></div>`}
 
 /* ---- shared plans, verse cards, account backup ---- */
@@ -682,7 +688,7 @@ function planSocial(id,p,st){if(!SOC.me)return '';
  const fr=ok.filter(f=>SOC.prog[f]&&SOC.prog[f][id]);
  h+=fr.map(f=>{const q=SOC.prog[f][id],pp=Math.min(100,Math.round(100*q.done/(q.days||1)));return `<div class="row2" style="font-size:16px;padding:8px 0"><span>${esc(socName(f))}</span><span style="display:flex;gap:10px;align-items:center;width:48%"><span class="bar" style="flex:1;margin:0"><i style="width:${pp}%"></i></span><small style="color:var(--muted);width:36px;text-align:right">${pp}%</small></span></div>`}).join('');
  if(ok.length){h+=`<button class="btn" data-pinv="${id}" style="margin-top:8px">${S.pinv===id?'Cancel':'Invite a friend…'}</button>`;
-  if(S.pinv===id)h+=`<div style="margin-top:8px">${ok.map(f=>`<button class="frow" data-pto="${id}|${f}"><div class="av">${initial(socName(f))}</div><div class="fm"><b>${esc(socName(f))}</b><small>Send an invitation to read along</small></div></button>`).join('')}</div>`}
+  if(S.pinv===id)h+=`<div style="margin-top:8px">${ok.map(f=>`<button class="frow" data-pto="${id}|${f}">${avFor(f)}<div class="fm"><b>${esc(socName(f))}</b><small>Send an invitation to read along</small></div></button>`).join('')}</div>`}
  return h}
 function planBind(){
  document.querySelectorAll('[data-psh]').forEach(b=>b.onclick=()=>{const st=S.plans[b.dataset.psh];st.share=!st.share;savePlans();render()});
@@ -698,7 +704,7 @@ function socShare(){const vs=selv();if(!vs.length)return;
  const ref=BOOKS[S.b].n+' '+S.c+':'+vlabel(vs),note=vs.map(v=>S.notes[key(v)]).filter(Boolean).join(' ');
  const ok=SOC.me?Object.keys(SOC.friends).filter(f=>SOC.friends[f].st==='ok'):[];
  const m=document.createElement('div');m.className='shm';m.id='shm';
- m.innerHTML=`<div class="shc"><h3 style="margin-top:0">Send ${esc(ref)}</h3>`+(ok.length?`${act()?`<div class="row2" style="font-size:16px"><span>Include the verse text<br><small style="color:var(--muted)">${esc(verName())}</small></span><span class="tg on" id="shx" role="switch" tabindex="0" aria-checked="true"></span></div>`:''}${note?`<div class="row2" style="font-size:16px"><span>Include my note</span><span class="tg on" id="shn" role="switch" tabindex="0" aria-checked="true"></span></div>`:''}<h3>Send to</h3>${ok.map(f=>`<button class="frow" data-sh="${f}"><div class="av">${initial(socName(f))}</div><div class="fm"><b>${esc(socName(f))}</b></div></button>`).join('')}`:`<div class="empty" style="padding:14px 0">${!SOC.ready?'Connecting to Social… try again in a moment.':SOC.me?'You have no friends added yet.':'Set up the Social tab first.'}</div><button class="btn p" id="shg">Open Social</button>`)+`<br><br><button class="btn" id="shc">Close</button></div>`;
+ m.innerHTML=`<div class="shc"><h3 style="margin-top:0">Send ${esc(ref)}</h3>`+(ok.length?`${act()?`<div class="row2" style="font-size:16px"><span>Include the verse text<br><small style="color:var(--muted)">${esc(verName())}</small></span><span class="tg on" id="shx" role="switch" tabindex="0" aria-checked="true"></span></div>`:''}${note?`<div class="row2" style="font-size:16px"><span>Include my note</span><span class="tg on" id="shn" role="switch" tabindex="0" aria-checked="true"></span></div>`:''}<h3>Send to</h3>${ok.map(f=>`<button class="frow" data-sh="${f}">${avFor(f)}<div class="fm"><b>${esc(socName(f))}</b></div></button>`).join('')}`:`<div class="empty" style="padding:14px 0">${!SOC.ready?'Connecting to Social… try again in a moment.':SOC.me?'You have no friends added yet.':'Set up the Social tab first.'}</div><button class="btn p" id="shg">Open Social</button>`)+`<br><br><button class="btn" id="shc">Close</button></div>`;
  document.body.appendChild(m);
  const close=()=>m.remove();m.onclick=e=>{if(e.target===m)close()};
  m.querySelector('#shc').onclick=close;if(m.querySelector('#shg'))m.querySelector('#shg').onclick=()=>{close();S.tab='soc';render()};
@@ -717,10 +723,37 @@ async function socForgot(){const[e]=acctVals();if(!e)return socNote('Type your e
 async function socSignOut(){try{await SOC.db.signOut();toast('Signed out');socReset()}catch(x){toast('Couldn’t sign out')}}
 function socReset(){Object.keys(SOC.subs).forEach(socUnsub);Object.assign(SOC,{ready:false,busy:false,me:null,friends:{},reqs:{},users:{},last:{},seen:{},msgs:[],cur:null,err:'',note:'',prog:{},acct:null,si:false,loaded:false,bd:0});socConnect()}
 function acctCard(){if(SOC.mode!=='live'||!SOC.acct)return '';const a=SOC.acct;
- if(!a.anon)return `<h3>Account</h3><div class="card"><div>Backed up as<br><b style="font-weight:400;color:var(--acc)">${esc(a.email)}</b></div><div class="note">Sign in with this email on another device to keep your friends and chats.</div><br><button class="btn" data-s="so">Sign out</button></div>`;
+ if(!a.anon)return '';
  return `<h3>Back up your account</h3><div class="card"><div class="note" style="margin:0 0 10px">Add an email and password so you don’t lose your friends if you clear your browser or switch devices.</div><div class="search"><input id="se" type="email" placeholder="Email" autocomplete="email"></div><div class="search"><input id="sp" type="password" placeholder="Password (6+ characters)" autocomplete="new-password"></div><button class="btn p" data-s="lk">Save</button></div>`}
 function signCard(){if(SOC.mode!=='live')return '';
  return `<div class="card" style="margin-top:14px"><b style="font-weight:400">Already have an account?</b><button class="lnk" data-s="tsi">${SOC.si?'Hide':'Sign in'}</button>${SOC.si?`<div style="margin-top:10px"><div class="search"><input id="se" type="email" placeholder="Email" autocomplete="email"></div><div class="search"><input id="sp" type="password" placeholder="Password" autocomplete="current-password"></div><div class="srow"><button class="btn p" data-s="si">Sign in</button><button class="lnk" data-s="fp">Forgot password</button></div></div>`:''}</div>`}
+
+/* ---- photos + confirmations ---- */
+const picOk=s=>typeof s==='string'&&s.length<14000&&/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(s);
+const avFor=(f,nm)=>{const p=f===SOC.uid?SOC.me:SOC.users[f],n=nm||(f===SOC.uid?(SOC.me&&SOC.me.name):socName(f));return p&&picOk(p.pic)?`<div class="av"><img src="${p.pic}" alt=""></div>`:`<div class="av">${initial(n)}</div>`};
+function socConfirm(title,body,label,fn){const m=document.createElement('div');m.className='shm';
+ m.innerHTML=`<div class="shc" role="dialog" aria-modal="true"><h3 style="margin-top:0">${esc(title)}</h3><div class="note" style="margin:0 0 18px;font-size:16px">${esc(body)}</div><div class="srow"><button class="btn p" id="cno">Cancel</button><button class="btn dg" id="cyes">${esc(label)}</button></div></div>`;
+ document.body.appendChild(m);const c=()=>m.remove();m.onclick=e=>{if(e.target===m)c()};m.querySelector('#cno').onclick=c;m.querySelector('#cyes').onclick=()=>{c();fn()};m.querySelector('#cno').focus()}
+async function socSavePic(u){if(!SOC.me)return;try{await SOC.db.update({['users/'+SOC.uid+'/pic']:u});toast(u?'Photo updated':'Photo removed')}catch(e){toast('Couldn’t save the photo')}}
+function socCrop(file){const url=URL.createObjectURL(file),img=new Image();
+ img.onerror=()=>{URL.revokeObjectURL(url);toast('That doesn’t look like an image')};
+ img.onload=()=>{const m=document.createElement('div');m.className='shm';
+  m.innerHTML=`<div class="shc" style="text-align:center"><h3 style="margin-top:0">Profile photo</h3><canvas id="pcv" width="240" height="240" style="width:240px;height:240px;border-radius:50%;touch-action:none;cursor:grab;background:#888"></canvas><div class="note" style="justify-content:center">Drag to reposition, slide to zoom</div><input id="pzm" aria-label="Zoom" type="range" min="1" max="3" step="0.01" value="1" style="width:80%;accent-color:var(--acc)"><br><br><div class="srow" style="justify-content:center"><button class="btn" id="pno">Cancel</button><button class="btn p" id="pyes">Use photo</button></div></div>`;
+  document.body.appendChild(m);
+  const cv=m.querySelector('#pcv'),z=m.querySelector('#pzm'),W=240;let ox=0,oy=0,d=null;
+  const sc=()=>W/Math.min(img.width,img.height)*+z.value;
+  const draw=(c,size)=>{const s=sc(),mx=Math.max(0,(img.width*s-W)/2),my=Math.max(0,(img.height*s-W)/2),k=size/W;ox=Math.max(-mx,Math.min(mx,ox));oy=Math.max(-my,Math.min(my,oy));
+   const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,size,size);x.drawImage(img,((W-img.width*s)/2+ox)*k,((W-img.height*s)/2+oy)*k,img.width*s*k,img.height*s*k)};
+  draw(cv,W);z.oninput=()=>draw(cv,W);
+  cv.onpointerdown=e=>{d={x:e.clientX,y:e.clientY,ox,oy};if(cv.setPointerCapture)try{cv.setPointerCapture(e.pointerId)}catch(x){}};
+  cv.onpointermove=e=>{if(!d)return;ox=d.ox+(e.clientX-d.x);oy=d.oy+(e.clientY-d.y);draw(cv,W)};cv.onpointerup=()=>d=null;
+  const done=()=>{URL.revokeObjectURL(url);m.remove()};m.onclick=e=>{if(e.target===m)done()};m.querySelector('#pno').onclick=done;
+  m.querySelector('#pyes').onclick=()=>{const o=document.createElement('canvas');o.width=o.height=128;draw(o,128);let q=.85,u=o.toDataURL('image/jpeg',q);while(u.length>12000&&q>.3){q-=.1;u=o.toDataURL('image/jpeg',q)}done();if(u.length>12000)return toast('That image is too detailed. Try another one.');socSavePic(u)}};
+ img.src=url}
+document.body.insertAdjacentHTML('beforeend','<input type="file" id="spic" accept="image/*" hidden>');
+$('#spic').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)socCrop(f)};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.shm,#spop').forEach(x=>x.remove())});
+const acctLine=()=>SOC.mode==='live'&&SOC.acct&&!SOC.acct.anon?`<div class="note" style="margin-top:10px">Signed in as ${esc(SOC.acct.email)} · <button class="lnk" data-s="so" style="margin:0">Sign out</button></div>`:'';
 function socRefresh(fr){const b=socBadge();if(b!==SOC.bd){SOC.bd=b;side()}
  if(S.tab!=='soc')return;const l=$('#sl');if(!l)return;
  const a=document.activeElement,id=a&&a.id,ss=a&&a.selectionStart,IDS=['sa','snm','sn','se','sp'],sv={};IDS.forEach(i=>{if($('#'+i))sv[i]=$('#'+i).value});
@@ -741,20 +774,27 @@ function socBindL(){const q=(s,f)=>document.querySelectorAll('#sl '+s).forEach(f
  q('[data-f]',b=>b.onclick=()=>socOpen(b.dataset.f));
  q('[data-acc]',b=>b.onclick=()=>socAccept(b.dataset.acc).catch(()=>toast('Couldn’t accept')));
  q('[data-dec]',b=>b.onclick=()=>socDecline(b.dataset.dec,false).catch(()=>{}));
- q('[data-blk]',b=>b.onclick=()=>socDecline(b.dataset.blk,true).then(()=>toast('Blocked')).catch(()=>{}));
+ q('[data-blk]',b=>b.onclick=()=>{const f=b.dataset.blk,nm=socName(f);socConfirm('Block '+nm+'?','They won’t be able to send you friend requests again.','Block',()=>socDecline(f,true).then(()=>toast('Blocked')).catch(()=>{}))});
+ if($('#spicb'))$('#spicb').onclick=()=>$('#spic').click();
  q('[data-cx]',b=>b.onclick=()=>socRemove(b.dataset.cx,false));
  q('[data-s]',b=>b.onclick=()=>{const a=b.dataset.s;
   if(a==='cc'){try{navigator.clipboard.writeText(fmtCode(SOC.me.code))}catch(e){}toast('Code copied')}
   if(a==='rn'){SOC.ed=true;socRefresh();const n=$('#sn');if(n){n.focus();n.onkeydown=e=>{if(e.key==='Enter')socRename(n.value)}}}
   if(a==='rs')socRename($('#sn').value);
-  if(a==='nc1'){SOC.nc=true;socRefresh()}if(a==='nc0'){SOC.nc=false;socRefresh()}if(a==='nc2')socNewCode();if(a==='lk')socLink();if(a==='so')socSignOut();if(a==='si')socSignIn();if(a==='fp')socForgot();if(a==='tsi'){SOC.si=!SOC.si;socRefresh()}})}
+  if(a==='ph')$('#spic').click();if(a==='rp')socSavePic(null);if(a==='nc1'){SOC.nc=true;socRefresh()}if(a==='nc0'){SOC.nc=false;socRefresh()}if(a==='nc2')socNewCode();if(a==='lk')socLink();if(a==='so')socSignOut();if(a==='si')socSignIn();if(a==='fp')socForgot();if(a==='tsi'){SOC.si=!SOC.si;socRefresh()}})}
 function socBindR(){
  if($('#sback'))$('#sback').onclick=()=>socClose();
- if($('#sdel'))$('#sdel').onclick=()=>socRemove(SOC.cur,false);
- if($('#sblk'))$('#sblk').onclick=()=>socRemove(SOC.cur,true);
+ if($('#smenu'))$('#smenu').onclick=e=>{e.stopPropagation();const old=$('#spop');if(old){old.remove();return}
+  const p=document.createElement('div');p.className='pop';p.id='spop';p.innerHTML='<button data-m="rm">Remove friend…</button><button data-m="bl">Block…</button>';$('#sr .chead').appendChild(p);
+  const f=SOC.cur,nm=socName(f);
+  p.onclick=ev=>{const m=ev.target.dataset.m;p.remove();
+   if(m==='rm')socConfirm('Remove '+nm+'?','You’ll stop being friends, and your chat history with them will be deleted.','Remove',()=>socRemove(f,false));
+   if(m==='bl')socConfirm('Block '+nm+'?','They’ll be removed as a friend, your chat will be deleted, and they won’t be able to send you requests.','Block',()=>socRemove(f,true))};
+  setTimeout(()=>document.addEventListener('click',()=>{const x=$('#spop');if(x)x.remove()},{once:true}),0)};
  if($('#ssend'))$('#ssend').onclick=socSend;
  const i=$('#sin');if(i){i.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();socSend()}};i.oninput=()=>{i.style.height='auto';i.style.height=Math.min(i.scrollHeight,140)+'px'}}
- if($('#sref'))$('#sref').onclick=()=>{const vs=selv();if(!vs.length)return toast('Select a verse in the Read tab first');i.value+=(i.value&&!/\s$/.test(i.value)?' ':'')+BOOKS[S.b].n+' '+S.c+':'+vlabel(vs);i.focus()};
+ if($('#sref'))$('#sref').onclick=()=>{let b=S.b,c=S.c,vs=selv();if(!vs.length&&S.pick&&S.pick.vs.length){b=S.pick.b;c=S.pick.c;vs=S.pick.vs}
+  const ref=BOOKS[b].n+' '+c+(vs.length?':'+vlabel(vs):'');i.value+=(i.value&&!/\s$/.test(i.value)?' ':'')+ref;i.dispatchEvent(new Event('input'));i.focus();toast(vs.length?'Inserted '+ref:'Inserted '+ref+' (the chapter you’re reading)')};
  if($('#smsgs'))$('#smsgs').onclick=e=>{
   const j=e.target.closest('[data-join]');if(j){const id=j.dataset.join;if(PL(id)&&!S.plans[id]){S.plans[id]={start:iso(new Date()),done:{},log:[]};savePlans();toast('Plan started. Find it under Plans.');socMsgs()}return}
   const a=e.target.closest('.rf');if(!a)return;const[b,c,v]=a.dataset.r.split('.').map(Number);if(!(b>=0&&b<66&&c>=1&&c<=BC[b]))return;S.b=b;S.c=c;S.sel=v||null;S.ex2=[];S.tab='read';render()}}
