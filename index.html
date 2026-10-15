@@ -295,6 +295,32 @@ async function sVid(R){
    w(p);if(cur)cur[1]+=' '}}
  for(const [b,c,v,l,x] of fnn){const e=nv(bk,b,c,v);if(e&&e[1])e[2].push(l+'. '+x)}
  return finish(bk)}
+async function sVref(R){
+ const bf=[];
+ for(const f of R.spine){const s=await R.get(f);if(/Verse-Ref/.test(s)&&/class="[^"]*Chapter-/.test(s))bf.push(s)}
+ if(bf.length!==66)return null;
+ const bk=blank(),it=clsSet(R.css,/font-style:\s*italic/),sc=clsSet(R.css,/small-caps/),has=(cl,S)=>cl.split(/\s+/).some(c=>S.has(c));
+ bf.forEach((s,bi)=>{const d=dom(s),VC=new Set([...d.querySelectorAll('p')].filter(p=>p.querySelector('span[class*="Verse-Ref"]')).map(p=>p.getAttribute('class')||''));let ch=0,cur=null,ph='';
+  const w=n=>{if(n.nodeType===3){if(cur)cur[1]+=esc(n.textContent.replace(/\u00a0/g,' '));return}
+   if(n.nodeType!==1)return;const t=n.tagName.toLowerCase(),cl=n.getAttribute('class')||'';
+   if(t==='sup')return;
+   if(t==='span'&&/Verse-Ref/.test(cl)){if(n._sk)return;
+    if(/^\d{1,3}$/.test(n.textContent.trim())){let num=n.textContent.trim(),nx=n.nextSibling;
+     while(nx){if(nx.nodeType===3&&!nx.textContent.trim()){nx=nx.nextSibling;continue}
+      if(nx.nodeType===1&&/Verse-Ref/.test(nx.getAttribute('class')||'')&&/^\d{1,3}$/.test(nx.textContent.trim())){num+=nx.textContent.trim();nx._sk=1;nx=nx.nextSibling;continue}break}
+     cur=nv(bk,bi,ch,+num,ph);ph='';return}}
+   if(t==='br'){if(cur)cur[1]+=' ';return}
+   const o=(t==='i'||t==='em'||has(cl,it))?'i':has(cl,sc)?'s':'',c0=cur;
+   if(o&&c0)c0[1]+='<'+o+'>';n.childNodes.forEach(w);if(o&&c0)c0[1]+='</'+o+'>'};
+  for(const p of d.querySelectorAll('p')){const cl=p.getAttribute('class')||'';
+   const cn=[...p.querySelectorAll('span')].find(x=>/(^|\s)Chapter-/.test(x.getAttribute('class')||'')&&/^\d{1,3}$/.test(x.textContent.trim()));
+   if(cn||/^H-3--Subtitles-Ch/.test(cl)){if(cn){ch=+cn.textContent.trim();cur=null;ph=''}continue}
+   if(!p.querySelector('span[class*="Verse-Ref"]')){
+    if(ch&&!cur&&VC.has(cl)){cur=nv(bk,bi,ch,1,ph);ph='';w(p);if(cur)cur[1]+=' ';continue}
+    const h=esc(p.textContent.replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim());if(ch&&h)ph=ph?ph+' '+h:h;continue}
+   w(p);if(cur)cur[1]+=' '}});
+ bk.forEach(b=>b.c.forEach(c=>c.v.forEach(e=>{e[1]=e[1].replace(/¶\s*/g,'').replace(/\s+([,.;:!?])/g,'$1')})));
+ return finish(bk)}
 async function sChapFiles(R){
  const hr=/^\s*(.+?)\s+(\d+)\s*(\[[^\]]*\])?\s*$/,docs=[];
  for(const f of R.spine){const d=dom(await R.get(f)),p0=d.querySelector('body p');if(!p0)continue;const m=hr.exec(p0.textContent.replace(/\u00a0/g,' '));if(!m)continue;const b=bookIdx(m[1]);if(b<0)continue;docs.push([b,+m[2],d])}
@@ -326,7 +352,7 @@ function sLines(txt){const bk=blank();let n=0;
  return n>=7000?finish(bk):null}
 async function importBible(f){
  const ext=(f.name.split('.').pop()||'').toLowerCase();
- if(ext==='epub'){const R=await readZip(f);for(const s of [sGeneva,sVid,sChapFiles]){const b=await s(R);if(b)return b}return null}
+ if(ext==='epub'){const R=await readZip(f);for(const s of [sGeneva,sVid,sVref,sChapFiles]){const b=await s(R);if(b)return b}return null}
  if(ext==='txt')return sLines(await f.text());
  return null}
 const KEEP=new Set('p h1 h2 h3 h4 h5 h6 blockquote ul ol li i em b strong sup sub'.split(' '));
