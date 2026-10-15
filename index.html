@@ -363,11 +363,20 @@ function doSearch(){const d=act(),q=(S.q||'').trim().toLowerCase(),el=$('#sr');
 function side(){
  $('#sd').innerHTML=`<div class="brand">${lamb(96)}<h4>Abide</h4></div>`+
  NAV.map(([k,i,l])=>`<button class="nav ${S.tab===k?'on':''}" data-t="${k}" aria-label="${l}" title="${l}">${ic(i)}<span>${l}</span>${k==='soc'&&socBadge()?`<b class="bdg">${socBadge()}</b>`:''}</button>`).join('')+
- `<div class="sp"></div><div class="pal">${THEMES.map(([k,l,c])=>`<button data-th="${k}" class="${theme()===k?'on':''}"><span class="sws3">${c.map(x=>`<b style="background:${x}"></b>`).join('')}</span>${l}</button>`).join('')}</div><button class="cyc" id="cy" title="Change palette">${ic('pal')}</button>`;
+ `<div class="sp"></div><button class="nav" id="shr" aria-label="Share Abide" title="Share Abide">${ic('up')}<span>Share Abide</span></button><div class="pal">${THEMES.map(([k,l,c])=>`<button data-th="${k}" class="${theme()===k?'on':''}"><span class="sws3">${c.map(x=>`<b style="background:${x}"></b>`).join('')}</span>${l}</button>`).join('')}</div><button class="cyc" id="cy" title="Change palette">${ic('pal')}</button>`;
  document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>{if(S.sel!==null)S.pick={b:S.b,c:S.c,vs:selv()};S.tab=b.dataset.t;S.sel=null;S.open=null;render()});
  document.querySelectorAll('[data-th]').forEach(b=>b.onclick=()=>setTheme(b.dataset.th));
  $('#cy').onclick=()=>{const i=THEMES.findIndex(x=>x[0]===theme());setTheme(THEMES[(i+1)%THEMES.length][0])};
+ $('#shr').onclick=shareApp;
 }
+async function shareApp(){
+ const url=location.origin+location.pathname.replace(/index\.html$/,''),data={title:'Abide',text:'Abide: a Bible study app',url};
+ if(navigator.share){try{await navigator.share(data);return}catch(e){if(e&&e.name==='AbortError')return}}
+ try{await navigator.clipboard.writeText(url);toast('Link copied. Paste it anywhere to share Abide.');return}catch(e){}
+ const m=document.createElement('div');m.className='shm';
+ m.innerHTML='<div class="shc"><h3 style="margin-top:0">Share Abide</h3><div class="note" style="margin:0 0 10px">Copy this link and send it to a friend.</div><div class="search"><input id="shu" readonly></div><button class="btn" id="shcl">Close</button></div>';
+ document.body.appendChild(m);const i=m.querySelector('#shu');i.value=url;i.focus();i.select();
+ const c=()=>m.remove();m.onclick=e=>{if(e.target===m)c()};m.querySelector('#shcl').onclick=c}
 function topbar(){
  const t=$('#tp');
  if(S.tab==='read')t.innerHTML=`<h2 id="ttl" class="ttl">${BOOKS[S.b].n} ${S.c}</h2><button class="ibt tmb" id="tm" title="More options">⋯</button><div class="tx"><select class="sel" id="vs">${trs().map(i=>`<option value="${i.id}" ${i.id===S.ver?'selected':''}>${esc(i.name)}</option>`).join('')}</select><button class="btn ${S.para?'p':''}" id="pg" title="Paragraph reading" aria-pressed="${!!S.para}">¶</button><button class="btn" id="ct" title="Switch between chapter and whole-book reading" aria-pressed="${!!S.cont}">${S.cont?'Chapter':'Book'}</button><button class="btn" id="fd">A−</button><button class="btn" id="fu">A+</button></div>`;
