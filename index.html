@@ -167,6 +167,11 @@ p.v:first-of-type:not(:has(sup))::first-letter{font-size:3.2em;float:left;line-h
 .cmp{display:flex;gap:8px;align-items:flex-end;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line)}
 .cmp textarea{flex:1;resize:none;max-height:140px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:10px 14px;font:inherit;font-size:17px;color:var(--ink);outline:0}
 .sb{display:none}
+.shm{position:fixed;inset:0;background:#0007;display:grid;place-items:center;z-index:30;padding:16px}
+.shc{background:var(--bg);border:1px solid var(--line);border-radius:20px;padding:22px;width:min(420px,100%);max-height:86vh;overflow-y:auto}
+.vcard{display:flex;flex-direction:column;gap:6px}.vcard .rf{font-size:.95em;letter-spacing:.04em}
+.vx{font-style:italic;line-height:1.5}.vn{opacity:.85;font-size:.92em;border-top:1px solid #8884;padding-top:6px}
+.vcard small,.pcard small{opacity:.75;margin:0}.pcard{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
 .soc .search{margin:0 0 8px}.soc .note{margin:6px 0 0}
 @media(max-width:900px){.soc{grid-template-columns:1fr}.soc .soc-r{display:none}.soc.co .soc-l{display:none}.soc.co .soc-r{display:flex}.sb{display:grid}.soc-l{border:0;padding:14px}.bdg{top:0;right:0}}
 </style><script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){})}</script>
@@ -400,7 +405,7 @@ function reader(){
 function rpanel(){
  if(S.sel!==null){const k=key(S.sel),ch=chData(),e=(ch&&ch.v.find(x=>x[0]===S.sel))||[],nts=e[2]||[],xr=e[3]||[];
   return `<h3 style="margin-top:0">${BOOKS[S.b].n} ${S.c}:${vlabel(selv())}</h3><div class="sws">${[['h1','var(--hl1)'],['h2','var(--hl2)'],['h3','var(--hl3)'],['h4','transparent']].map(([c,b])=>`<button class="sw" data-h="${c}" style="background:${b}">${c==='h4'?'<u>U</u>':''}</button>`).join('')}<button class="sw" data-h="">∅</button></div>
-  <div class="tools"><button data-a="bm">${ic('bm')}${S.bm[k]?'Unmark':'Bookmark'}</button><button data-a="note">${ic('pen')}Note</button><button data-a="copy">${ic('cp')}Copy</button><button data-a="x">${ic('x')}Done</button></div>
+  <div class="tools"><button data-a="bm">${ic('bm')}${S.bm[k]?'Unmark':'Bookmark'}</button><button data-a="note">${ic('pen')}Note</button><button data-a="copy">${ic('cp')}Copy</button><button data-a="share">${ic('snd')}Send</button><button data-a="x">${ic('x')}Done</button></div>
   <button class="btn mtog" data-a="more">${S.more?'Hide notes':'Note & references'}</button><div class="more"><h3>Note</h3><textarea id="nt" rows="4" placeholder="Write a note…" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;font:inherit;font-size:16px;color:var(--ink);outline:0">${esc(S.notes[k]||'')}</textarea>`+
   (act()?`<h3>Margin notes</h3>${nts.length?nts.map(t=>`<div class="card res" style="padding:12px;font-size:16px;line-height:1.5">${t}</div>`).join(''):'<div class="note">No margin notes on this verse.</div>'}<h3>Cross references</h3>${xr.length?`<div class="refs">${xr.map(x=>`<span class="tag">${x}</span>`).join('')}</div>`:'<div class="note">None listed.</div>'}`:'')+'</div>'}
  const bl=(a,b)=>BOOKS.slice(a,b).map((x,j)=>`<button class="bk ${a+j===S.b?'on':''}" data-b="${a+j}">${x.n}<span>${x.c}</span></button>`).join('');
@@ -423,7 +428,7 @@ const PLANS=[
  {id:'jn21',name:'The Gospel of John',days:21,d:'One chapter a day through John.',ch:()=>slice(42,42)}];
 const LC={},chs=p=>LC[p.id]||(LC[p.id]=p.ch()),PL=id=>PLANS.find(p=>p.id===id);
 const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-const savePlans=()=>{try{localStorage.setItem('bib-plans',JSON.stringify(S.plans))}catch(e){}};
+const savePlans=()=>{try{localStorage.setItem('bib-plans',JSON.stringify(S.plans))}catch(e){}socPublish()};
 const rd=(p,d)=>{const L=chs(p),out=[];for(const [b,c] of L.slice(Math.floor(d*L.length/p.days),Math.floor((d+1)*L.length/p.days))){const l=out[out.length-1];if(l&&l.b===b&&l.e===c-1)l.e=c;else out.push({b,s:c,e:c})}return out};
 const dayDone=(p,st,d)=>rd(p,d).every((_,i)=>st.done[d+'.'+i]);
 const curDay=(p,st)=>{for(let d=0;d<p.days;d++)if(!dayDone(p,st,d))return d;return p.days};
@@ -437,7 +442,7 @@ function plan(){
  if(mine.length){h+='<h3>Your plans</h3>';mine.forEach(id=>{const p=PL(id),st=S.plans[id];st.done=st.done||{};st.log=st.log||[];
   const cd=curDay(p,st),fin=[...new Set(Object.keys(st.done).map(k=>+k.split('.')[0]))].filter(d=>d<p.days&&dayDone(p,st,d)).length,pc=Math.round(fin/p.days*100);
   const sched=Math.min(p.days,Math.floor((new Date(iso(new Date()))-new Date(st.start))/864e5)+1),behind=Math.max(0,sched-cd-1);
-  h+=`<div class="card"><div style="display:flex;gap:18px;align-items:center"><div class="ring" style="--p:${pc}"><div>${pc}%</div></div><div style="flex:1;min-width:0"><div style="font-size:22px">${p.name}</div><small style="color:var(--muted)">${cd>=p.days?'Complete':'Day '+(cd+1)+' of '+p.days+(behind?' · '+behind+' day'+(behind>1?'s':'')+' behind':' · on track')}</small></div><button class="btn" data-reset="${id}">Restart</button><button class="btn" data-stop="${id}" title="Remove plan">${ic('x')}</button></div><div class="bar"><i style="width:${pc}%"></i></div>`;
+  h+=`<div class="card"><div style="display:flex;gap:18px;align-items:center"><div class="ring" style="--p:${pc}"><div>${pc}%</div></div><div style="flex:1;min-width:0"><div style="font-size:22px">${p.name}</div><small style="color:var(--muted)">${cd>=p.days?'Complete':'Day '+(cd+1)+' of '+p.days+(behind?' · '+behind+' day'+(behind>1?'s':'')+' behind':' · on track')}</small></div><button class="btn" data-reset="${id}">Restart</button><button class="btn" data-stop="${id}" title="Remove plan">${ic('x')}</button></div><div class="bar"><i style="width:${pc}%"></i></div>${planSocial(id,p,st)}`;
   h+=cd>=p.days?'<div class="note">You finished this plan. Well done.</div>':`<h3>Day ${cd+1} reading</h3>`+rd(p,cd).map((r,i)=>`<div class="row2"><span>${rlabel(r)}</span><span style="display:flex;gap:12px;align-items:center"><button class="btn" data-open="${r.b}.${r.s}">Open</button><span class="tg ${st.done[cd+'.'+i]?'on':''}" role="switch" tabindex="0" aria-label="Mark as read" aria-checked="${!!st.done[cd+'.'+i]}" data-chk="${id}|${cd}|${i}" title="Mark as read"></span></span></div>`).join('');
   if(cd>0){const pd=cd-1;h+=`<h3>Day ${cd} · done</h3>`+rd(p,pd).map((r,i)=>`<div class="row2"><span>${rlabel(r)}</span><span class="tg ${st.done[pd+'.'+i]?'on':''}" role="switch" tabindex="0" aria-label="Mark as read" aria-checked="${!!st.done[pd+'.'+i]}" data-chk="${id}|${pd}|${i}"></span></div>`).join('')}h+='</div>'})}
  if(avail.length)h+='<h3>'+(mine.length?'More plans':'Choose a plan')+'</h3>'+avail.map(p=>`<div class="card" style="display:flex;gap:16px;align-items:center"><div style="flex:1"><div style="font-size:20px">${p.name}</div><small style="color:var(--muted)">${p.days} days · ${p.d}</small></div><button class="btn p" data-start="${p.id}">Start</button></div>`).join('');
@@ -542,8 +547,8 @@ const FBDB={
  mode:'live',
  async init(){const b='https://www.gstatic.com/firebasejs/'+FBV+'/';
   const [A,U,D]=await Promise.all([import(b+'firebase-app.js'),import(b+'firebase-auth.js'),import(b+'firebase-database.js')]);
-  const app=A.initializeApp(SOC_FIREBASE),auth=U.getAuth(app);
-  await new Promise((res,rej)=>{const off=U.onAuthStateChanged(auth,u=>{if(u){off();res()}});U.signInAnonymously(auth).catch(rej)});
+  const app=this.app||(this.app=A.initializeApp(SOC_FIREBASE)),auth=U.getAuth(app);this.auth=auth;this.U=U;
+  const u0=await new Promise(res=>{const off=U.onAuthStateChanged(auth,u=>{off();res(u)})});if(!u0)await U.signInAnonymously(auth);
   this.uid=auth.currentUser.uid;this.D=D;this.db=D.getDatabase(app)},
  ref(p){return this.D.ref(this.db,p)},
  async get(p){return (await this.D.get(this.ref(p))).val()},
@@ -551,7 +556,12 @@ const FBDB={
  update(o){return this.D.update(this.D.ref(this.db),o)},
  push(p,v){return this.D.set(this.D.push(this.ref(p)),v)},
  on(p,cb,n){const q=n?this.D.query(this.ref(p),this.D.limitToLast(n)):this.ref(p);return this.D.onValue(q,s=>cb(s.val()),()=>cb(null))},
- ts(){return this.D.serverTimestamp()}};
+ ts(){return this.D.serverTimestamp()},
+ account(){const u=this.auth.currentUser;return{email:u.email||'',anon:u.isAnonymous}},
+ link(e,p){const U=this.U;return U.linkWithCredential(this.auth.currentUser,U.EmailAuthProvider.credential(e,p))},
+ signIn(e,p){return this.U.signInWithEmailAndPassword(this.auth,e,p)},
+ reset(e){return this.U.sendPasswordResetEmail(this.auth,e)},
+ signOut(){return this.U.signOut(this.auth)}};
 const LOCDB={ // tiny stand-in for the server: shares data between tabs of this browser
  mode:'preview',ls:[],
  async init(){let u=null;try{u=sessionStorage.getItem('bib-uid')}catch(e){}
@@ -566,11 +576,12 @@ const LOCDB={ // tiny stand-in for the server: shares data between tabs of this 
  async update(o){const t=this.load();for(const p in o)this.wr(t,p,o[p]);this.keep(t)},
  async push(p,v){const k=Date.now().toString(36).padStart(9,'0')+Math.random().toString(36).slice(2,5);return this.set(p+'/'+k,v)},
  ts(){return Date.now()},
+ account(){return{email:'',anon:true}},
  val(p,n){let v=this.rd(this.load(),p);if(n&&v&&typeof v==='object'){const o={};Object.keys(v).sort().slice(-n).forEach(k=>o[k]=v[k]);v=o}return v},
  on(p,cb,n){const l={p,n,cb,last:undefined};this.ls.push(l);setTimeout(()=>this.tick(l),0);return()=>{this.ls=this.ls.filter(x=>x!==l)}},
  tick(l){if(!this.ls.includes(l))return;const v=this.val(l.p,l.n),s=JSON.stringify(v);if(s!==l.last){l.last=s;l.cb(v)}},
  fire(){this.ls.slice().forEach(l=>this.tick(l))}};
-const SOC={ready:false,busy:false,mode:'',uid:'',db:null,me:null,friends:{},reqs:{},users:{},last:{},seen:{},msgs:[],cur:null,err:'',note:'',subs:{},read:{},loaded:false,bd:0,ed:false,nc:false};
+const SOC={prog:{},acct:null,si:false,ready:false,busy:false,mode:'',uid:'',db:null,me:null,friends:{},reqs:{},users:{},last:{},seen:{},msgs:[],cur:null,err:'',note:'',subs:{},read:{},loaded:false,bd:0,ed:false,nc:false};
 try{SOC.read=JSON.parse(localStorage.getItem('bib-socread')||'{}')}catch(e){}
 const socSub=(k,f)=>{if(!SOC.subs[k])SOC.subs[k]=f()};
 const socUnsub=k=>{if(SOC.subs[k]){try{SOC.subs[k]()}catch(e){}delete SOC.subs[k]}};
@@ -584,19 +595,19 @@ const socBadge=()=>{const n=Object.keys(SOC.reqs).length+Object.keys(SOC.friends
 const socNote=t=>{SOC.note=t;if(S.tab==='soc')socRefresh()};
 async function socConnect(){
  if(SOC.ready||SOC.busy)return;SOC.busy=true;SOC.err='';socRefresh();
- try{const db=SOC_FIREBASE?FBDB:LOCDB;await db.init();SOC.db=db;SOC.uid=db.uid;SOC.mode=db.mode;SOC.me=await db.get('users/'+SOC.uid);SOC.ready=true;socWatch()}
+ try{const db=SOC_FIREBASE?FBDB:LOCDB;await db.init();SOC.db=db;SOC.uid=db.uid;SOC.mode=db.mode;SOC.me=await db.get('users/'+SOC.uid);SOC.acct=db.account();SOC.ready=true;socWatch()}
  catch(e){const m=String(e&&(e.code||e.message)||e);SOC.err=/admin-restricted|operation-not-allowed/.test(m)?'Anonymous sign-in isn’t switched on in your Firebase project yet. See SOCIAL_SETUP.md.':'Couldn’t connect to the chat server. '+(navigator.onLine===false?'You appear to be offline.':'Check your connection and the Firebase setup.')}
  SOC.busy=false;socRefresh()}
 function socWatch(){const d=SOC.db,u=SOC.uid;
- socSub('me',()=>d.on('users/'+u,v=>{SOC.me=v;socRefresh()}));
+ socSub('me',()=>d.on('users/'+u,v=>{SOC.me=v;socRefresh();if(S.tab==='plan')render()}));
  socSub('inbox',()=>d.on('inbox/'+u,v=>{SOC.reqs=v||{};socRefresh()}));
- socSub('friends',()=>d.on('friends/'+u,v=>{SOC.friends=v||{};socSync();SOC.loaded=true;socRefresh()}))}
+ socSub('friends',()=>d.on('friends/'+u,v=>{SOC.friends=v||{};socSync();SOC.loaded=true;socRefresh();if(S.tab==='plan')render()}));socPublish()}
 function socSync(){const d=SOC.db,u=SOC.uid,F=SOC.friends;
  Object.keys(F).forEach(f=>{
   socSub('u:'+f,()=>d.on('users/'+f,v=>{SOC.users[f]=v;socRefresh()}));
   socSub('o:'+f,()=>d.on('friends/'+f+'/'+u,v=>socOther(f,v)));
-  if(F[f].st==='ok')socSub('l:'+f,()=>d.on('chats/'+spair(f),v=>socLast(f,v),1))});
- Object.keys(SOC.subs).forEach(k=>{const m=/^[uol]:(.+)$/.exec(k);if(m&&!F[m[1]]){socUnsub(k);if(m[1]===SOC.cur)socClose()}})}
+  if(F[f].st==='ok'){socSub('l:'+f,()=>d.on('chats/'+spair(f),v=>socLast(f,v),1));socSub('p:'+f,()=>d.on('progress/'+f,v=>{SOC.prog[f]=(v&&v.p)||null;if(S.tab==='plan')render()}))}});
+ Object.keys(SOC.subs).forEach(k=>{const m=/^[uolp]:(.+)$/.exec(k);if(m&&!F[m[1]]){socUnsub(k);if(m[1]===SOC.cur)socClose()}})}
 function socOther(f,v){const mine=SOC.friends[f];if(!mine)return;
  if(mine.st==='pending'&&v)SOC.db.update({['friends/'+SOC.uid+'/'+f]:{st:'ok',ts:mine.ts||Date.now()}}).catch(()=>{});
  else if(mine.st==='ok'&&!v)SOC.db.get('friends/'+f+'/'+SOC.uid).then(x=>{if(!x&&SOC.friends[f]&&SOC.friends[f].st==='ok')SOC.db.update({['friends/'+SOC.uid+'/'+f]:null})}).catch(()=>{})}
@@ -636,13 +647,13 @@ const REFRE=new RegExp('\\b('+BN.slice().sort((a,b)=>b.length-a.length).concat([
 const socText=t=>esc(t).replace(REFRE,(m,n,c,v)=>{const b=bookIdx(n.replace(/\s+/g,' '));if(b<0||+c<1||+c>BC[b]||(!v&&n[0]!==n[0].toUpperCase()))return m;return `<a class="rf" data-r="${b}.${c}.${v||0}">${m}</a>`}).replace(/\n/g,'<br>');
 function socMsgs(){const el=$('#smsgs');if(!el)return;const near=!el.dataset.init||el.scrollHeight-el.scrollTop-el.clientHeight<90;let h='',ld='';
  SOC.msgs.forEach(m=>{const d=new Date(m.ts||Date.now()),ds=d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});if(ds!==ld){h+=`<div class="dsep">${ds}</div>`;ld=ds}
-  h+=`<div class="m ${m.f===SOC.uid?'me':'th'}"><div class="mb">${socText(m.t||'')}</div><small>${d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})}</small></div>`});
+  h+=`<div class="m ${m.f===SOC.uid?'me':'th'}">${socBody(m)}<small>${d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})}</small></div>`});
  el.innerHTML=h||'<div class="empty">Say hello. Type a verse like “John 3:16” and it becomes a link they can open in their own Bible.</div>';el.dataset.init=1;if(near)el.scrollTop=el.scrollHeight}
 function socLeft(){
  if(SOC.err)return `<div class="card"><div>${esc(SOC.err)}</div><br><button class="btn p" id="sretry">Try again</button></div>`;
  if(!SOC.ready)return '<div class="empty">Connecting…</div>';
  const banner=SOC.mode==='preview'?`<div class="card"><b style="font-weight:400;color:var(--acc)">Preview mode</b><div class="note" style="margin-top:6px">Not connected to a server yet, so friends and chat only work between tabs of this browser. Open Abide in a second tab to try it. To go live, follow SOCIAL_SETUP.md.</div></div>`:'';
- if(!SOC.me)return banner+`<div class="card"><h3 style="margin-top:0">Welcome</h3><div class="note" style="margin:0 0 10px">Choose the name your friends will see. You’ll get a private code to share.</div><div class="search"><input id="snm" maxlength="30" placeholder="Your name" autocomplete="off"></div><button class="btn p" id="scr">Create my code</button>${SOC.note?`<div class="note">${esc(SOC.note)}</div>`:''}</div>`;
+ if(!SOC.me)return banner+`<div class="card"><h3 style="margin-top:0">Welcome</h3><div class="note" style="margin:0 0 10px">Choose the name your friends will see. You’ll get a private code to share.</div><div class="search"><input id="snm" maxlength="30" placeholder="Your name" autocomplete="off"></div><button class="btn p" id="scr">Create my code</button>${SOC.note?`<div class="note">${esc(SOC.note)}</div>`:''}</div>${signCard()}`;
  const F=Object.entries(SOC.friends).sort((a,b)=>(b[1].st==='ok')-(a[1].st==='ok')||((SOC.last[b[0]]&&SOC.last[b[0]].ts)||0)-((SOC.last[a[0]]&&SOC.last[a[0]].ts)||0));
  const R=Object.entries(SOC.reqs);
  return banner+`<div class="card"><div class="sme"><div class="av">${initial(SOC.me.name)}</div>${SOC.ed?`<div class="search" style="margin:0;flex:1"><input id="sn" maxlength="30" value="${esc(SOC.me.name)}"></div><button class="btn p" data-s="rs">Save</button>`:`<div><b>${esc(SOC.me.name)}</b><button class="lnk" data-s="rn">Rename</button></div>`}</div>
@@ -652,18 +663,70 @@ function socLeft(){
  <h3>Add a friend</h3><div class="search"><input id="sa" placeholder="Their code, e.g. ABCD-2345" autocomplete="off" autocapitalize="characters" maxlength="12"></div><button class="btn p" id="sadd">Send request</button>${SOC.note?`<div class="note">${esc(SOC.note)}</div>`:''}
  ${R.length?`<h3>Requests (${R.length})</h3>`+R.map(([f,r])=>`<div class="rq"><div class="av">${initial(r.name)}</div><div class="fm">${esc(r.name||'Someone')}<br><small style="color:var(--muted)">wants to be friends</small></div><button class="btn p" data-acc="${f}">Accept</button><button class="btn" data-dec="${f}">Decline</button><button class="lnk" data-blk="${f}">Block</button></div>`).join(''):''}
  <h3>Friends (${F.filter(x=>x[1].st==='ok').length})</h3>
- ${F.length?F.map(([f,x])=>{const nm=socName(f),l=SOC.last[f];return x.st==='ok'?`<button class="frow ${SOC.cur===f?'on':''}" data-f="${f}"><div class="av">${initial(nm)}</div><div class="fm"><b>${esc(nm)}</b><small>${l?(l.f===SOC.uid?'You: ':'')+esc(l.t||''):'No messages yet'}</small></div>${unread(f)?'<span class="ud" title="Unread"></span>':''}</button>`:`<div class="frow"><div class="av">${initial(nm)}</div><div class="fm"><b>${esc(nm)}</b><small>Request sent, waiting for them</small></div><button class="lnk" data-cx="${f}">Cancel</button></div>`}).join(''):'<div class="empty" style="padding:18px 0">No friends yet. Share your code, or enter a friend’s above.</div>'}`}
+ ${F.length?F.map(([f,x])=>{const nm=socName(f),l=SOC.last[f];return x.st==='ok'?`<button class="frow ${SOC.cur===f?'on':''}" data-f="${f}"><div class="av">${initial(nm)}</div><div class="fm"><b>${esc(nm)}</b><small>${l?(l.f===SOC.uid?'You: ':'')+esc(l.t||''):'No messages yet'}</small></div>${unread(f)?'<span class="ud" title="Unread"></span>':''}</button>`:`<div class="frow"><div class="av">${initial(nm)}</div><div class="fm"><b>${esc(nm)}</b><small>Request sent, waiting for them</small></div><button class="lnk" data-cx="${f}">Cancel</button></div>`}).join(''):'<div class="empty" style="padding:18px 0">No friends yet. Share your code, or enter a friend’s above.</div>'}${acctCard()}`}
 function socRight(){
  if(!SOC.cur||!SOC.friends[SOC.cur])return `<div class="empty" style="margin:auto">${lamb(110)}<br><br>Choose a friend to start talking.<div class="note" style="justify-content:center">${ic('lock')}<span>${SOC.mode==='preview'?'Preview messages stay on this device.':'Messages are stored on the chat server. Your Bible files are never uploaded.'}</span></div></div>`;
  const nm=socName(SOC.cur);
  return `<div class="chead"><button class="ibt sb" id="sback" title="Back">${ic('l')}</button><div class="av">${initial(nm)}</div><b>${esc(nm)}</b><button class="btn" id="sdel">Remove</button><button class="btn" id="sblk">Block</button></div><div class="smsgs" id="smsgs"></div><div class="cmp"><button class="ibt" id="sref" title="Insert the verse you have selected">${ic('read')}</button><textarea id="sin" rows="1" maxlength="1000" placeholder="Message…"></textarea><button class="btn p" id="ssend" title="Send">${ic('snd')}</button></div>`}
 function social(){if(!SOC.ready&&!SOC.busy&&!SOC.err)socConnect();return `<div class="soc ${SOC.cur?'co':''}" id="soc"><div class="soc-l" id="sl">${socLeft()}</div><div class="soc-r" id="sr">${socRight()}</div></div>`}
+
+/* ---- shared plans, verse cards, account backup ---- */
+let PPT;
+function socPublish(){clearTimeout(PPT);PPT=setTimeout(()=>{if(!SOC.ready||!SOC.me)return;const o={};
+ Object.keys(S.plans).filter(PL).forEach(id=>{const st=S.plans[id],p=PL(id);if(!st.share)return;st.done=st.done||{};
+  const n=new Set(Object.keys(st.done).map(k=>+k.split('.')[0]).filter(d=>d<p.days&&dayDone(p,st,d))).size;o[id]={done:n,days:p.days}});
+ Promise.resolve(SOC.db.set('progress/'+SOC.uid,Object.keys(o).length?{p:o,ts:SOC.db.ts()}:null)).catch(()=>{})},500)}
+function planSocial(id,p,st){if(!SOC.me)return '';
+ const ok=Object.keys(SOC.friends).filter(f=>SOC.friends[f].st==='ok');
+ let h=`<div class="row2" style="font-size:16px;border:0;padding:10px 0 4px"><span>Share my progress with friends<br><small style="color:var(--muted)">Only your accepted friends can see it.</small></span><span class="tg ${st.share?'on':''}" role="switch" tabindex="0" aria-checked="${!!st.share}" data-psh="${id}"></span></div>`;
+ const fr=ok.filter(f=>SOC.prog[f]&&SOC.prog[f][id]);
+ h+=fr.map(f=>{const q=SOC.prog[f][id],pp=Math.min(100,Math.round(100*q.done/(q.days||1)));return `<div class="row2" style="font-size:16px;padding:8px 0"><span>${esc(socName(f))}</span><span style="display:flex;gap:10px;align-items:center;width:48%"><span class="bar" style="flex:1;margin:0"><i style="width:${pp}%"></i></span><small style="color:var(--muted);width:36px;text-align:right">${pp}%</small></span></div>`}).join('');
+ if(ok.length){h+=`<button class="btn" data-pinv="${id}" style="margin-top:8px">${S.pinv===id?'Cancel':'Invite a friend…'}</button>`;
+  if(S.pinv===id)h+=`<div style="margin-top:8px">${ok.map(f=>`<button class="frow" data-pto="${id}|${f}"><div class="av">${initial(socName(f))}</div><div class="fm"><b>${esc(socName(f))}</b><small>Send an invitation to read along</small></div></button>`).join('')}</div>`}
+ return h}
+function planBind(){
+ document.querySelectorAll('[data-psh]').forEach(b=>b.onclick=()=>{const st=S.plans[b.dataset.psh];st.share=!st.share;savePlans();render()});
+ document.querySelectorAll('[data-pinv]').forEach(b=>b.onclick=()=>{S.pinv=S.pinv===b.dataset.pinv?null:b.dataset.pinv;render()});
+ document.querySelectorAll('[data-pto]').forEach(b=>b.onclick=()=>{const[i,f]=b.dataset.pto.split('|'),p=PL(i);S.pinv=null;
+  Promise.resolve(SOC.db.push('chats/'+spair(f),{f:SOC.uid,t:'Join me: '+p.name,ts:SOC.db.ts(),p:{i,n:p.name,d:p.days}})).then(()=>toast('Invitation sent to '+socName(f))).catch(()=>toast('Couldn’t send the invitation'));render()})}
+const socBody=m=>{
+ if(m.v){const v=m.v;return `<div class="mb vcard"><a class="rf" data-r="${esc(v.o||'')}">${esc(v.r||m.t||'')}</a>${v.x?`<div class="vx">${esc(v.x)}</div>`:''}${v.n?`<div class="vn">${socText(v.n)}</div>`:''}${v.tr?`<small>${esc(v.tr)}</small>`:''}</div>`}
+ if(m.p){const p=m.p;return `<div class="mb pcard"><small>Reading plan invitation</small><b style="font-weight:400;font-size:1.05em">${esc(p.n||'')}</b><small>${+p.d||0} days</small>${m.f!==SOC.uid&&PL(p.i)?(S.plans[p.i]?'<small>You’re already on this plan</small>':`<button class="btn p" data-join="${esc(p.i)}">Start this plan</button>`):''}</div>`}
+ return `<div class="mb">${socText(m.t||'')}</div>`};
+function socShare(){const vs=selv();if(!vs.length)return;
+ if(!SOC.ready&&!SOC.busy&&!SOC.err)socConnect();
+ const ref=BOOKS[S.b].n+' '+S.c+':'+vlabel(vs),note=vs.map(v=>S.notes[key(v)]).filter(Boolean).join(' ');
+ const ok=SOC.me?Object.keys(SOC.friends).filter(f=>SOC.friends[f].st==='ok'):[];
+ const m=document.createElement('div');m.className='shm';m.id='shm';
+ m.innerHTML=`<div class="shc"><h3 style="margin-top:0">Send ${esc(ref)}</h3>`+(ok.length?`${act()?`<div class="row2" style="font-size:16px"><span>Include the verse text<br><small style="color:var(--muted)">${esc(verName())}</small></span><span class="tg on" id="shx" role="switch" tabindex="0" aria-checked="true"></span></div>`:''}${note?`<div class="row2" style="font-size:16px"><span>Include my note</span><span class="tg on" id="shn" role="switch" tabindex="0" aria-checked="true"></span></div>`:''}<h3>Send to</h3>${ok.map(f=>`<button class="frow" data-sh="${f}"><div class="av">${initial(socName(f))}</div><div class="fm"><b>${esc(socName(f))}</b></div></button>`).join('')}`:`<div class="empty" style="padding:14px 0">${!SOC.ready?'Connecting to Social… try again in a moment.':SOC.me?'You have no friends added yet.':'Set up the Social tab first.'}</div><button class="btn p" id="shg">Open Social</button>`)+`<br><br><button class="btn" id="shc">Close</button></div>`;
+ document.body.appendChild(m);
+ const close=()=>m.remove();m.onclick=e=>{if(e.target===m)close()};
+ m.querySelector('#shc').onclick=close;if(m.querySelector('#shg'))m.querySelector('#shg').onclick=()=>{close();S.tab='soc';render()};
+ m.querySelectorAll('.tg').forEach(g=>g.onclick=()=>{g.classList.toggle('on');g.setAttribute('aria-checked',g.classList.contains('on'))});
+ m.querySelectorAll('[data-sh]').forEach(b=>b.onclick=()=>{const f=b.dataset.sh,sx=m.querySelector('#shx'),sn=m.querySelector('#shn'),dec=s=>s.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>'),v={r:ref,o:S.b+'.'+S.c+'.'+vs[0]};
+  if(act())v.tr=verName().slice(0,80);
+  if(sx&&sx.classList.contains('on')){const x=dec(vs.map(n=>verseText(S.b,S.c,n)).join(' ')).trim().slice(0,1200);if(x)v.x=x}
+  if(sn&&sn.classList.contains('on')&&note)v.n=note.slice(0,600);
+  Promise.resolve(SOC.db.push('chats/'+spair(f),{f:SOC.uid,t:ref,ts:SOC.db.ts(),v})).then(()=>toast('Sent to '+socName(f))).catch(()=>toast('Couldn’t send'));close()})}
+const socAuthErr=e=>{const c=String(e&&e.code||e);return /weak-password/.test(c)?'Use a password with at least 6 characters.':/invalid-email/.test(c)?'That email address doesn’t look right.':/email-already-in-use|credential-already-in-use/.test(c)?'That email is already in use. Use “Sign in” instead.':/wrong-password|invalid-credential|user-not-found/.test(c)?'Email or password isn’t right.':/operation-not-allowed/.test(c)?'Email sign-in isn’t switched on in Firebase yet (see SOCIAL_SETUP.md).':/too-many/.test(c)?'Too many tries. Please wait a bit.':'That didn’t work. Please try again.'};
+const socErr=x=>{const m=socAuthErr(x);toast(m);socNote(m)};
+const acctVals=()=>[(($('#se')||{}).value||'').trim(),($('#sp')||{}).value||''];
+async function socLink(){const[e,p]=acctVals();if(!e||!p){toast('Enter an email and a password');return socNote('Enter an email and a password.')}try{await SOC.db.link(e,p);SOC.acct=SOC.db.account();SOC.note='';socRefresh();toast('Account backed up')}catch(x){socErr(x)}}
+async function socSignIn(){const[e,p]=acctVals();if(!e||!p){toast('Enter your email and password');return socNote('Enter your email and password.')}try{await SOC.db.signIn(e,p);toast('Signed in');socReset()}catch(x){socErr(x)}}
+async function socForgot(){const[e]=acctVals();if(!e)return socNote('Type your email above first.');try{await SOC.db.reset(e);socNote('Password reset email sent. Check your inbox.')}catch(x){socErr(x)}}
+async function socSignOut(){try{await SOC.db.signOut();toast('Signed out');socReset()}catch(x){toast('Couldn’t sign out')}}
+function socReset(){Object.keys(SOC.subs).forEach(socUnsub);Object.assign(SOC,{ready:false,busy:false,me:null,friends:{},reqs:{},users:{},last:{},seen:{},msgs:[],cur:null,err:'',note:'',prog:{},acct:null,si:false,loaded:false,bd:0});socConnect()}
+function acctCard(){if(SOC.mode!=='live'||!SOC.acct)return '';const a=SOC.acct;
+ if(!a.anon)return `<h3>Account</h3><div class="card"><div>Backed up as<br><b style="font-weight:400;color:var(--acc)">${esc(a.email)}</b></div><div class="note">Sign in with this email on another device to keep your friends and chats.</div><br><button class="btn" data-s="so">Sign out</button></div>`;
+ return `<h3>Back up your account</h3><div class="card"><div class="note" style="margin:0 0 10px">Add an email and password so you don’t lose your friends if you clear your browser or switch devices.</div><div class="search"><input id="se" type="email" placeholder="Email" autocomplete="email"></div><div class="search"><input id="sp" type="password" placeholder="Password (6+ characters)" autocomplete="new-password"></div><button class="btn p" data-s="lk">Save</button></div>`}
+function signCard(){if(SOC.mode!=='live')return '';
+ return `<div class="card" style="margin-top:14px"><b style="font-weight:400">Already have an account?</b><button class="lnk" data-s="tsi">${SOC.si?'Hide':'Sign in'}</button>${SOC.si?`<div style="margin-top:10px"><div class="search"><input id="se" type="email" placeholder="Email" autocomplete="email"></div><div class="search"><input id="sp" type="password" placeholder="Password" autocomplete="current-password"></div><div class="srow"><button class="btn p" data-s="si">Sign in</button><button class="lnk" data-s="fp">Forgot password</button></div></div>`:''}</div>`}
 function socRefresh(fr){const b=socBadge();if(b!==SOC.bd){SOC.bd=b;side()}
  if(S.tab!=='soc')return;const l=$('#sl');if(!l)return;
- const a=document.activeElement,id=a&&a.id,v=$('#sa')?$('#sa').value:'',nv=$('#snm')?$('#snm').value:'',ss=a&&a.selectionStart;
+ const a=document.activeElement,id=a&&a.id,ss=a&&a.selectionStart,IDS=['sa','snm','sn','se','sp'],sv={};IDS.forEach(i=>{if($('#'+i))sv[i]=$('#'+i).value});
  l.innerHTML=socLeft();socBindL();
- if($('#sa'))$('#sa').value=v;if($('#snm'))$('#snm').value=nv;
- if(id&&$('#'+id)&&['sa','snm','sn'].includes(id)){$('#'+id).focus();try{$('#'+id).setSelectionRange(ss,ss)}catch(e){}}
+ IDS.forEach(i=>{if($('#'+i)&&i in sv)$('#'+i).value=sv[i]});
+ if(id&&IDS.includes(id)&&$('#'+id)){$('#'+id).focus();try{$('#'+id).setSelectionRange(ss,ss)}catch(e){}}
  const so=$('#soc');if(so)so.classList.toggle('co',!!SOC.cur);
  const has=!!$('#smsgs'),want=!!(SOC.cur&&SOC.friends[SOC.cur]);
  if(fr||has!==want){$('#sr').innerHTML=socRight();socBindR();socMsgs()}
@@ -684,7 +747,7 @@ function socBindL(){const q=(s,f)=>document.querySelectorAll('#sl '+s).forEach(f
   if(a==='cc'){try{navigator.clipboard.writeText(fmtCode(SOC.me.code))}catch(e){}toast('Code copied')}
   if(a==='rn'){SOC.ed=true;socRefresh();const n=$('#sn');if(n){n.focus();n.onkeydown=e=>{if(e.key==='Enter')socRename(n.value)}}}
   if(a==='rs')socRename($('#sn').value);
-  if(a==='nc1'){SOC.nc=true;socRefresh()}if(a==='nc0'){SOC.nc=false;socRefresh()}if(a==='nc2')socNewCode()})}
+  if(a==='nc1'){SOC.nc=true;socRefresh()}if(a==='nc0'){SOC.nc=false;socRefresh()}if(a==='nc2')socNewCode();if(a==='lk')socLink();if(a==='so')socSignOut();if(a==='si')socSignIn();if(a==='fp')socForgot();if(a==='tsi'){SOC.si=!SOC.si;socRefresh()}})}
 function socBindR(){
  if($('#sback'))$('#sback').onclick=()=>socClose();
  if($('#sdel'))$('#sdel').onclick=()=>socRemove(SOC.cur,false);
@@ -692,7 +755,9 @@ function socBindR(){
  if($('#ssend'))$('#ssend').onclick=socSend;
  const i=$('#sin');if(i){i.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();socSend()}};i.oninput=()=>{i.style.height='auto';i.style.height=Math.min(i.scrollHeight,140)+'px'}}
  if($('#sref'))$('#sref').onclick=()=>{const vs=selv();if(!vs.length)return toast('Select a verse in the Read tab first');i.value+=(i.value&&!/\s$/.test(i.value)?' ':'')+BOOKS[S.b].n+' '+S.c+':'+vlabel(vs);i.focus()};
- if($('#smsgs'))$('#smsgs').onclick=e=>{const a=e.target.closest('.rf');if(!a)return;const[b,c,v]=a.dataset.r.split('.').map(Number);S.b=b;S.c=c;S.sel=v||null;S.ex2=[];S.tab='read';render()}}
+ if($('#smsgs'))$('#smsgs').onclick=e=>{
+  const j=e.target.closest('[data-join]');if(j){const id=j.dataset.join;if(PL(id)&&!S.plans[id]){S.plans[id]={start:iso(new Date()),done:{},log:[]};savePlans();toast('Plan started. Find it under Plans.');socMsgs()}return}
+  const a=e.target.closest('.rf');if(!a)return;const[b,c,v]=a.dataset.r.split('.').map(Number);if(!(b>=0&&b<66&&c>=1&&c<=BC[b]))return;S.b=b;S.c=c;S.sel=v||null;S.ex2=[];S.tab='read';render()}}
 
 function render(){try{localStorage.setItem('bib-ver',S.ver)}catch(e){}
  side();topbar();$('.shell').classList.toggle('lc',!!S.lc);layout();
@@ -716,7 +781,7 @@ function render(){try{localStorage.setItem('bib-ver',S.ver)}catch(e){}
   rp.querySelectorAll('[data-b]').forEach(b=>b.onclick=()=>{S.b=+b.dataset.b;S.c=1;S.sel=null;render()});
   rp.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{S.c=+b.dataset.c;S.sel=null;if(S.cont)S.jump=S.c;if(innerWidth<=900)S.rc=true;render()});
   rp.querySelectorAll('[data-h]').forEach(b=>b.onclick=()=>{selv().forEach(v=>{const k=key(v);b.dataset.h?S.hl[k]=b.dataset.h:delete S.hl[k]});render()});
-  rp.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const k=key(S.sel),a=b.dataset.a;if(a==='more'){S.more=!S.more;render();return}
+  rp.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const k=key(S.sel),a=b.dataset.a;if(a==='more'){S.more=!S.more;render();return}if(a==='share'){socShare();return}
    if(a==='bm'){const vs=selv(),all=vs.every(v=>S.bm[key(v)]);vs.forEach(v=>all?delete S.bm[key(v)]:S.bm[key(v)]=1)}
    if(a==='note'){const t=$('#nt').value.trim();t?S.notes[k]=t:delete S.notes[k];toast('Note saved')}
    if(a==='copy'){const vs=selv();try{navigator.clipboard.writeText(vs.map(v=>(vs.length>1?v+' ':'')+verseText(S.b,S.c,v)).join(' ').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')+' — '+BOOKS[S.b].n+' '+S.c+':'+vlabel(vs))}catch(e){}toast('Copied')}
@@ -724,7 +789,7 @@ function render(){try{localStorage.setItem('bib-ver',S.ver)}catch(e){}
  }
  if(S.tab==='lib'||S.tab==='ex')bindLib();
  document.querySelectorAll('[data-dl]').forEach(b=>b.onclick=()=>{const c=S.catalog[+b.dataset.dl];fetchSrc(c.url,c.name,c.kind)});
- if(S.tab==='plan')bindPlans();
+ if(S.tab==='plan'){bindPlans();planBind()}
  if(S.tab==='soc')socBind();else if(SOC.cur)socClose();
  if(S.tab==='marks'){$('#bd').querySelectorAll('[data-g]').forEach(x=>x.onclick=()=>{const[b,c,v]=x.dataset.g.split('.').map(Number);S.b=b;S.c=c;S.sel=v;S.tab='read';render()});$('#bd').querySelectorAll('[data-mf]').forEach(x=>x.onclick=()=>{S.mf=x.dataset.mf;render()})}
  if(S.tab==='set'){$('#bx').onclick=exportData;$('#bi').onclick=()=>$('#bf').click()}
