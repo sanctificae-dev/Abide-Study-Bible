@@ -117,7 +117,12 @@ p.v:first-of-type:not(:has(sup))::first-letter{font-size:3.2em;float:left;line-h
 .gn{display:inline-block;width:6px;height:6px;border:1.5px solid var(--acc);border-radius:50%;margin-left:6px;vertical-align:middle}
 .sec{font-size:calc(var(--fs)*.72);letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin:24px 0 8px;text-align:center}
 .ex p{font-size:var(--fs);line-height:1.7;margin:0 0 14px}.ex h1,.ex h2,.ex h3,.ex h4{font-weight:400;color:var(--acc);margin:24px 0 10px;line-height:1.25}
-.ex blockquote{border-left:3px solid var(--acc);padding-left:16px;color:var(--muted);margin:0 0 14px}.ex li{font-size:var(--fs);line-height:1.6}
+.ex blockquote{border-left:3px solid var(--acc);padding-left:16px;color:var(--muted);margin:0 0 14px}.ex li{font-size:var(--fs);line-height:1.6}.ex li>p{margin:0 0 6px}
+.ex img{max-width:100%;height:auto;display:block;margin:14px auto;border-radius:4px}.ex figure{margin:14px 0}.ex figcaption{font-size:.85em;color:var(--muted);text-align:center;margin-top:4px}
+.ex .ctr{text-align:center}.ex .rgt{text-align:right}.ex .ind{margin-left:2em}.ex s{text-decoration:none;font-variant:small-caps;letter-spacing:.03em}.ex del{opacity:.7}
+.ex hr{border:0;border-top:1px solid var(--line);margin:24px 0}.ex pre{white-space:pre-wrap;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:.85em;overflow-x:auto}
+.ex code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.88em}.ex table{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%;margin:0 0 16px}.ex td,.ex th{border:1px solid var(--line);padding:6px 10px;vertical-align:top;font-size:calc(var(--fs)*.9)}.ex td p,.ex th p{margin:0}
+.ex dt{font-weight:400;color:var(--acc);margin-top:10px}.ex dd{margin:0 0 8px 1.6em}.ex ul,.ex ol{padding-left:1.6em;margin:0 0 14px}.ex sup,.ex sub{font-size:.7em}
 .days{display:flex;gap:6px}.days span{width:32px;height:32px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--line);font-size:14px}.days .d{background:var(--acc);color:var(--on-acc);border-color:var(--acc)}
 .bar{height:6px;background:var(--line);border-radius:9px;margin:14px 0 2px;overflow:hidden}.bar i{display:block;height:100%;background:var(--acc);transition:width .3s}
 .refs{display:flex;flex-wrap:wrap;gap:6px}mark{background:var(--hl1);color:inherit;border-radius:3px;padding:0 2px}
@@ -257,14 +262,14 @@ async function readZip(f){
  const z=await JSZip.loadAsync(f),cache=new Map(),names=Object.keys(z.files);
  const get=async n=>{if(!cache.has(n))cache.set(n,await z.files[n].async('string'));return cache.get(n)};
  const cont=z.files['META-INF/container.xml']?await get('META-INF/container.xml'):'',opfP=(/full-path="([^"]+)"/.exec(cont)||[])[1];
- let spine=[],title='';
+ let spine=[],title='',navPath='',ncxPath='';
  if(opfP&&z.files[opfP]){const opf=await get(opfP),dir=opfP.replace(/[^/]*$/,''),man={};
-  for(const m of opf.matchAll(/<item\b[^>]*>/g)){const id=/\bid="([^"]+)"/.exec(m[0]),h=/\bhref="([^"]+)"/.exec(m[0]);if(id&&h){let p=h[1];try{p=decodeURIComponent(p)}catch(e){}man[id[1]]=dir+p}}
+  for(const m of opf.matchAll(/<item\b[^>]*>/g)){const id=/\bid="([^"]+)"/.exec(m[0]),h=/\bhref="([^"]+)"/.exec(m[0]);if(id&&h){let p=h[1];try{p=decodeURIComponent(p)}catch(e){}man[id[1]]=dir+p;if(/properties="[^"]*\bnav\b/.test(m[0]))navPath=dir+p;if(/application\/x-dtbncx\+xml/.test(m[0]))ncxPath=dir+p}}
   spine=[...opf.matchAll(/<itemref\b[^>]*idref="([^"]+)"/g)].map(m=>man[m[1]]).filter(p=>p&&/\.x?html?$/i.test(p)&&z.files[p]);
   title=((/<dc:title[^>]*>([^<]+)</.exec(opf)||[])[1]||'').trim()}
  if(!spine.length)spine=names.filter(n=>/\.x?html?$/i.test(n)).sort();
  let css='';for(const n of names)if(/\.css$/i.test(n))css+=await get(n)+'\n';
- return{names,spine,title,css,get}}
+ return{z,names,spine,title,css,get,navPath,ncxPath}}
 const blank=()=>BN.map((n,i)=>({n,ot:i<39,c:Array.from({length:BC[i]},()=>({a:'',v:[]}))}));
 const nv=(bk,b,c,v,h)=>{const ch=bk[b]&&bk[b].c[c-1];if(!ch)return null;let e=ch.v.find(x=>x[0]===v);if(!e){e=[v,'',[],[],h||''];ch.v.push(e)}return e};
 const finish=bk=>{let n=0;bk.forEach(b=>b.c.forEach(c=>{c.v.sort((a,b)=>a[0]-b[0]);c.v.forEach(e=>{e[1]=e[1].replace(/\s+/g,' ').trim();n++})}));return n>=7000?bk:null};
@@ -355,8 +360,6 @@ async function importBible(f){
  if(ext==='epub'){const R=await readZip(f);for(const s of [sGeneva,sVid,sVref,sChapFiles]){const b=await s(R);if(b)return b}return null}
  if(ext==='txt')return sLines(await f.text());
  return null}
-const KEEP=new Set('p h1 h2 h3 h4 h5 h6 blockquote ul ol li i em b strong sup sub'.split(' '));
-function clean(el){let o='';el.childNodes.forEach(c=>{if(c.nodeType===3)o+=esc(c.textContent);else if(c.nodeType===1){const t=c.tagName.toLowerCase();if(/^(script|style|img|svg|head|title|nav|audio|video|iframe|object)$/.test(t))return;if(t==='br'){o+='<br>';return}if(KEEP.has(t))o+='<'+t+'>'+clean(c)+'</'+t+'>';else o+=clean(c)}});return o}
 function textSections(txt){
  const paras=txt.replace(/\r/g,'').split(/\n\s*\n/).map(s=>s.trim()).filter(Boolean),secs=[],P=p=>'<p>'+esc(p.replace(/\s*\n\s*/g,' '))+'</p>';
  let cur={t:'Beginning',p:[]};const flush=()=>{if(cur.p.length)secs.push({t:cur.t,h:cur.p.join('')})};
@@ -366,13 +369,116 @@ function textSections(txt){
  flush();
  if(secs.length<=1&&txt.length>30000){const out=[];let buf=[],len=0;for(const p of paras){buf.push(P(p));len+=p.length;if(len>12000){out.push({t:'Part '+(out.length+1),h:buf.join('')});buf=[];len=0}}if(buf.length)out.push({t:'Part '+(out.length+1),h:buf.join('')});return out}
  return secs}
+
+/* ===== one-size-fits-all book converter (EPUB / HTML / Markdown -> clean, styled HTML) ===== */
+const MRE=/\u0001[^\u0001]*\u0001/g;
+const rp=(base,h)=>{if(!h)return base;try{h=decodeURIComponent(h)}catch(e){}const o=[];for(const s of (base.replace(/[^/]*$/,'')+h).split('/')){if(s==='..')o.pop();else if(s!=='.'&&s!=='')o.push(s)}return o.join('/')};
+const hkey=(base,h)=>{const i=h.indexOf('#'),f=i<0?h:h.slice(0,i),fr=i<0?'':h.slice(i+1);return rp(base,f)+(fr?'#'+fr:'')};
+function declSt(d){const st={};
+ if(/font-style\s*:\s*(italic|oblique)/i.test(d))st.i=1;if(/font-style\s*:\s*normal/i.test(d))st.ni=1;
+ if(/font-weight\s*:\s*(bold|[6-9]00)/i.test(d))st.b=1;if(/font-weight\s*:\s*(normal|[1-4]00)/i.test(d))st.nb=1;
+ if(/font-variant[^:;]*:\s*small-caps/i.test(d))st.sc=1;
+ if(/text-decoration[^:;]*:[^;]*underline/i.test(d))st.u=1;
+ const ta=/text-align\s*:\s*(center|right)/i.exec(d);if(ta)st.al=ta[1].toLowerCase();
+ const ml=/margin-left\s*:\s*([\d.]+)\s*(em|px|%|pt|rem)/i.exec(d);if(ml&&parseFloat(ml[1])>0)st.ind=1;
+ if(/display\s*:\s*none/i.test(d))st.hide=1;return st}
+function cssMap(css){const M={};css=(css||'').replace(/\/\*[\s\S]*?\*\//g,'');
+ for(const m of css.matchAll(/([^{}@]+)\{([^{}]*)\}/g)){const st=declSt(m[2]);if(!Object.keys(st).length)continue;
+  for(const sel of m[1].split(',')){const k=sel.trim();if(/^(\.[\w-]+|[a-z][a-z0-9]*|[a-z][a-z0-9]*\.[\w-]+)$/i.test(k))M[k]=Object.assign(M[k]||{},st)}}
+ return M}
+const styleOf=(el,M)=>{const t=el.tagName.toLowerCase(),st={},cs=(el.getAttribute('class')||'').split(/\s+/).filter(Boolean),take=o=>{if(o)Object.assign(st,o)};
+ take(M[t]);cs.forEach(c=>{take(M['.'+c]);take(M[t+'.'+c]);
+  if(!M['.'+c]){if(/(^|[-_])(italics?|ital|emph)([-_]|$)/i.test(c))st.i=1;if(/(^|[-_])(bold|strong)([-_]|$)/i.test(c))st.b=1;if(/(^|[-_])(cent(er|re)d?)([-_]|$)/i.test(c))st.al='center';if(/small-?caps|smcap/i.test(c))st.sc=1}});
+ const s=el.getAttribute('style');if(s)take(declSt(s));return st};
+const BLK=new Set('p div section article aside header footer main body center blockquote ul ol li dl dt dd table pre hr figure figcaption h1 h2 h3 h4 h5 h6 address details summary form fieldset'.split(' '));
+const SKIP=/^(script|style|head|title|nav|audio|video|iframe|object|svg|math|noscript|link|meta)$/;
+function mkConv(M,imgs,tg,file){
+ const hasT=h=>/\S/.test(h.replace(/<br>/g,'').replace(/<(?!img)[^>]+>/g,''))||/<img/.test(h);
+ const wrap=(h,st)=>{if(st.i&&!st.ni)h='<i>'+h+'</i>';if(st.b&&!st.nb)h='<b>'+h+'</b>';if(st.sc)h='<s>'+h+'</s>';if(st.u)h='<u>'+h+'</u>';return h};
+ const hoist=(h,nm)=>[h.replace(MRE,''),nm?'':(h.match(MRE)||[]).join('')];
+ const mkr=(n,nm)=>{const id=n.getAttribute&&n.getAttribute('id');return !nm&&id&&tg.has(file+'#'+id)?'\u0001'+file+'#'+id+'\u0001':''};
+ const para=(h,st,nm,tag)=>{const[x,ms]=hoist(h.replace(/\s+/g,' ').trim(),nm);if(!hasT(x))return ms;
+  const c=[st.al==='center'?'ctr':st.al==='right'?'rgt':'',st.ind?'ind':''].filter(Boolean).join(' ');return ms+'<'+(tag||'p')+(c?' class="'+c+'"':'')+'>'+wrap(x,st)+'</'+(tag||'p')+'>'};
+ const inl=n=>{if(n.nodeType===3)return esc(n.textContent.replace(/\u00a0/g,' ').replace(/\u00ad/g,''));if(n.nodeType!==1)return '';
+  const t=n.tagName.toLowerCase();if(t==='br')return '<br>';if(SKIP.test(t))return '';
+  if(t==='img'){const s=imgs.get(n);return s?'<img src="'+s+'" alt="'+esc(n.getAttribute('alt')||'').replace(/"/g,'&quot;')+'">':''}
+  const st=styleOf(n,M);if(st.hide)return '';let h=mkr(n)+[...n.childNodes].map(inl).join('');
+  if(/^(i|em|cite|dfn|var)$/.test(t)){h='<i>'+h+'</i>';st.i=0}
+  else if(/^(b|strong)$/.test(t)){h='<b>'+h+'</b>';st.b=0}
+  else if(/^(u|ins)$/.test(t)){h='<u>'+h+'</u>';st.u=0}
+  else if(/^(s|strike|del)$/.test(t))h='<del>'+h+'</del>';
+  else if(t==='sup'||t==='sub')h='<'+t+'>'+h+'</'+t+'>';
+  else if(/^(code|kbd|samp|tt)$/.test(t))h='<code>'+h+'</code>';
+  return wrap(h,st)};
+ const inlAll=n=>[...n.childNodes].map(inl).join('');
+ const inh=(c,st)=>{const o=Object.assign({},c);['i','b','sc','u','al','ind'].forEach(k=>{if(st[k])o[k]=st[k]});if(st.ni)o.i=0;if(st.nb)o.b=0;return o};
+ const blocks=(el,ctx,nm)=>{let out='',buf='';const flush=()=>{out+=para(buf,ctx,nm);buf=''};
+  for(const n of el.childNodes){if(n.nodeType===3){buf+=esc(n.textContent.replace(/\u00a0/g,' ').replace(/\u00ad/g,''));continue}
+   if(n.nodeType!==1)continue;const t=n.tagName.toLowerCase();if(SKIP.test(t))continue;const st=styleOf(n,M);if(st.hide)continue;
+   if(BLK.has(t)){flush();out+=block(n,t,st,ctx,nm)}else buf+=inl(n)}
+  flush();return out};
+ const block=(n,t,st,ctx,nm)=>{const mk=mkr(n,nm),c2=inh(ctx,st);
+  if(/^h[1-6]$/.test(t)){const[x,ms]=hoist(inlAll(n).replace(/\s+/g,' ').trim(),nm);return hasT(x)?mk+ms+'<'+t+'>'+x+'</'+t+'>':mk+ms}
+  if(t==='p'||t==='dt'||t==='figcaption'||t==='summary'||t==='address')return mk+para(inlAll(n),c2,nm,t==='p'?'p':t==='dt'?'dt':t==='figcaption'?'figcaption':'p');
+  if(t==='blockquote')return mk+'<blockquote>'+blocks(n,c2,true)+'</blockquote>';
+  if(t==='ul'||t==='ol')return mk+'<'+t+'>'+[...n.children].filter(c=>c.tagName==='LI').map(li=>'<li>'+blocks(li,c2,true)+'</li>').join('')+'</'+t+'>';
+  if(t==='dl')return mk+'<dl>'+[...n.children].map(c=>c.tagName==='DT'?'<dt>'+inlAll(c)+'</dt>':c.tagName==='DD'?'<dd>'+blocks(c,c2,true)+'</dd>':'').join('')+'</dl>';
+  if(t==='pre')return mk+'<pre>'+esc(n.textContent)+'</pre>';
+  if(t==='hr')return mk+'<hr>';
+  if(t==='table'){const rows=[...n.querySelectorAll('tr')].filter(r=>r.closest('table')===n).map(r=>'<tr>'+[...r.children].filter(c=>/^t[dh]$/i.test(c.tagName)).map(c=>{const tg2=c.tagName.toLowerCase(),cs=parseInt(c.getAttribute('colspan')),rs=parseInt(c.getAttribute('rowspan'));return '<'+tg2+(cs>1&&cs<20?' colspan="'+cs+'"':'')+(rs>1&&rs<20?' rowspan="'+rs+'"':'')+'>'+blocks(c,c2,true)+'</'+tg2+'>'}).join('')+'</tr>').join('');return mk+(rows?'<table>'+rows+'</table>':'')}
+  if(t==='figure')return mk+'<figure>'+blocks(n,c2,true)+'</figure>';
+  return mk+blocks(n,t==='center'?inh(c2,{al:'center'}):c2,nm)};
+ return{body:el=>blocks(el,{},false)}}
+async function loadImgs(d,file,R,imgs,bud){
+ for(const im of d.querySelectorAll('img')){const src=im.getAttribute('src');if(!src||/^(data:|https?:)/i.test(src))continue;
+  const p=rp(file,src),fo=R.z.files[p],m=/\.(png|jpe?g|gif|webp)$/i.exec(p);if(!fo||!m)continue;
+  const b=await fo.async('base64');if(b.length>1.3e6||bud.n+b.length>1.2e7)continue;bud.n+=b.length;imgs.set(im,'data:image/'+(m[1].toLowerCase()==='jpg'?'jpeg':m[1].toLowerCase())+';base64,'+b)}}
+async function parseToc(R){const out=[];
+ try{if(R.navPath&&R.z.files[R.navPath]){const d=dom(await R.get(R.navPath)),nv=[...d.querySelectorAll('nav')].find(n=>/toc/.test(n.getAttribute('epub:type')||n.getAttribute('type')||''))||d.querySelector('nav');
+  const walk=(ol,dp)=>[...ol.children].forEach(li=>{if(li.tagName!=='LI')return;const a=[...li.children].find(c=>c.tagName==='A');if(a&&a.getAttribute('href'))out.push({t:a.textContent.replace(/\s+/g,' ').trim(),k:hkey(R.navPath,a.getAttribute('href')),d:dp});const sub=[...li.children].find(c=>c.tagName==='OL'||c.tagName==='UL');if(sub)walk(sub,dp+1)});
+  const ol=nv&&[...nv.children].find(c=>c.tagName==='OL'||c.tagName==='UL');if(ol)walk(ol,0)}}catch(e){}
+ if(!out.length&&R.ncxPath&&R.z.files[R.ncxPath]){try{const d=new DOMParser().parseFromString(await R.get(R.ncxPath),'text/xml'),nm=d.getElementsByTagName('navMap')[0];
+  const walk=(el,dp)=>[...el.children].forEach(c=>{if(c.localName!=='navPoint')return;const lab=c.getElementsByTagName('text')[0],ct=[...c.children].find(x=>x.localName==='content');if(lab&&ct&&ct.getAttribute('src'))out.push({t:lab.textContent.replace(/\s+/g,' ').trim(),k:hkey(R.ncxPath,ct.getAttribute('src')),d:dp});walk(c,dp+1)});
+  if(nm)walk(nm,0)}catch(e){}}
+ return out}
+const plainLen=h=>h.replace(/<[^>]+>/g,'').replace(/&[a-z#0-9]+;/g,' ').trim().length;
+const normT=s=>s.replace(/<[^>]+>/g,'').replace(/&[a-z#0-9]+;/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'');
+function splitH(html,fallback){const parts=html.split(/(?=<h[12][ >])/).filter(p=>plainLen(p)>0||/<img/.test(p));if(parts.length<2)return[{t:fallback,h:html,d:0}];
+ const out=[];let carry='';parts.forEach((p,i)=>{p=carry+p;const m=/^<h[12][^>]*>([\s\S]*?)<\/h[12]>/.exec(p);if(plainLen(p)<120&&i<parts.length-1&&m){carry=p;return}carry='';out.push({t:m?m[1].replace(/<[^>]+>/g,'').trim().slice(0,80)||fallback:fallback,h:p,d:0})});
+ if(carry)out.push({t:fallback,h:carry,d:0});return out}
+function tidy(secs){return secs.map(s=>{let h=s.h.replace(MRE,'');const m=/^\s*<h[1-6]>([\s\S]*?)<\/h[1-6]>/.exec(h);if(m&&normT(m[1])&&normT(m[1])===normT(s.t)&&plainLen(h.slice(m[0].length))>0)h=h.slice(m[0].length);return{t:s.t,h,d:s.d||0}}).filter(s=>plainLen(s.h)>0||/<img/.test(s.h))}
+async function epubSections(R){
+ const entries=await parseToc(R),tg=new Set(entries.map(e=>e.k)),imgs=new Map(),bud={n:0},M0=cssMap(R.css);let all='';const per=[];
+ for(let i=0;i<R.spine.length;i++){const file=rp('',R.spine[i]),d=dom(await R.get(R.spine[i]));if(!d.body)continue;
+  const lc=[...d.querySelectorAll('style')].map(s=>s.textContent).join('\n'),M=lc?Object.assign({},M0,cssMap(lc)):M0;
+  await loadImgs(d,file,R,imgs,bud);const h='\u0001'+file+'\u0001'+mkConv(M,imgs,tg,file).body(d.body);per.push([file,h,d.title||'']);all+=h}
+ let pos=[];entries.forEach(e=>{const i=all.indexOf('\u0001'+e.k+'\u0001');if(i>=0)pos.push(Object.assign({i},e))});
+ pos.sort((a,b)=>a.i-b.i);pos=pos.filter((p,j)=>!j||pos[j-1].i!==p.i);if(pos.length>700)pos=pos.filter(p=>p.d<=1);
+ if(pos.length>=2){let secs=[];const pre=all.slice(0,pos[0].i).replace(MRE,'');if(plainLen(pre)>150||/<img/.test(pre))secs.push({t:'Beginning',h:pre,d:0});
+  pos.forEach((u,j)=>secs.push({t:u.t.slice(0,80)||'Section '+(j+1),h:all.slice(u.i,j+1<pos.length?pos[j+1].i:all.length),d:u.d}));
+  const mg=[];let carry='';secs.forEach((s,j)=>{const h=carry+s.h,nx=secs[j+1];if(plainLen(h)<80&&!/<img/.test(h)&&nx&&nx.d<=s.d){carry=h;return}carry='';mg.push({t:s.t,h,d:s.d})});if(carry&&mg.length)mg[mg.length-1].h+=carry;
+  const r=tidy(mg);if(r.length)return r}
+ const out=[];per.forEach(([file,h,title])=>{const clean=h.replace(MRE,'');if(plainLen(clean)<40&&!/<img/.test(clean))return;splitH(clean,(title||'').trim().slice(0,80)||'Section '+(out.length+1)).forEach(s=>out.push(s))});
+ return tidy(out)}
+function mdInline(s){s=esc(s);return s.replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*\*([^*]+)\*\*|__([^_]+)__/g,(m,a,b)=>'<b>'+(a||b)+'</b>').replace(/(^|[\s(])\*([^*\s][^*]*)\*(?=$|[\s).,;:!?])/g,'$1<i>$2</i>').replace(/(^|[\s(])_([^_\s][^_]*)_(?=$|[\s).,;:!?])/g,'$1<i>$2</i>').replace(/!?\[([^\]]*)\]\([^)]*\)/g,'$1')}
+function mdHtml(txt){const L=txt.replace(/\r/g,'').split('\n');let o='',i=0;
+ while(i<L.length){const l=L[i];
+  if(/^\s*```/.test(l)){let c=[];i++;while(i<L.length&&!/^\s*```/.test(L[i]))c.push(L[i++]);i++;o+='<pre>'+esc(c.join('\n'))+'</pre>';continue}
+  const h=/^(#{1,6})\s+(.*?)\s*#*\s*$/.exec(l);if(h){o+='<h'+h[1].length+'>'+mdInline(h[2])+'</h'+h[1].length+'>';i++;continue}
+  if(/^\s*([-*_]\s*){3,}$/.test(l)){o+='<hr>';i++;continue}
+  if(/^\s*>/.test(l)){let c=[];while(i<L.length&&/^\s*>/.test(L[i]))c.push(L[i++].replace(/^\s*>\s?/,''));o+='<blockquote>'+mdHtml(c.join('\n'))+'</blockquote>';continue}
+  if(/^\s*([-*+]|\d+[.)])\s+/.test(l)){const ord=/^\s*\d/.test(l);let c=[];while(i<L.length&&/^\s*([-*+]|\d+[.)])\s+/.test(L[i]))c.push(L[i++].replace(/^\s*([-*+]|\d+[.)])\s+/,''));o+=(ord?'<ol>':'<ul>')+c.map(x=>'<li><p>'+mdInline(x)+'</p></li>').join('')+(ord?'</ol>':'</ul>');continue}
+  if(!l.trim()){i++;continue}
+  let c=[];while(i<L.length&&L[i].trim()&&!/^(#{1,6}\s|\s*>|\s*```|\s*([-*+]|\d+[.)])\s+)/.test(L[i]))c.push(L[i++]);o+='<p>'+mdInline(c.join(' '))+'</p>'}
+ return o}
 async function importText(f,ext){
- if(ext==='epub'){const R=await readZip(f),out=[];
-  for(const p of R.spine){const d=dom(await R.get(p)),b=d.body;if(!b||b.textContent.replace(/\s+/g,' ').trim().length<40)continue;const h=d.querySelector('h1,h2,h3');out.push({t:((h&&h.textContent)||d.title||'Section '+(out.length+1)).replace(/\s+/g,' ').trim().slice(0,80),h:clean(b)})}
-  return out}
+ if(ext==='epub'){const R=await readZip(f);return epubSections(R)}
  const txt=await f.text();
- if(ext==='html'||ext==='htm'){const d=dom(txt);return[{t:(d.title||f.name).slice(0,80),h:clean(d.body)}]}
+ if(ext==='html'||ext==='htm'){const d=dom(txt),M=cssMap([...d.querySelectorAll('style')].map(s=>s.textContent).join('\n')),imgs=new Map();
+  return tidy(splitH(mkConv(M,imgs,new Set(),'').body(d.body),(d.title||f.name).slice(0,80)))}
+ if(ext==='md'||ext==='markdown')return tidy(splitH(mdHtml(txt),f.name.replace(/\.[^.]+$/,'').slice(0,80)));
  return textSections(txt)}
+
 const act=()=>DB[S.ver];
 const chData=()=>{const d=act();return d&&d[S.b]&&d[S.b].c[S.c-1]};
 const verseText=(b,c,v)=>{const d=act(),ch=d&&d[b]&&d[b].c[c-1],e=ch&&ch.v.find(x=>x[0]===v);return e?e[1].replace(/<[^>]+>/g,''):''};
@@ -530,7 +636,7 @@ function lib(){
  <h3>More</h3><div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:16px"><div><div style="font-size:19px">Extra-biblical texts</div><small style="color:var(--muted)">Apocrypha, early writings, commentaries and devotionals have their own shelf.</small></div><button class="btn" id="goex">Open shelf</button></div></div></div>`}
 function ex(){
  if(S.exOpen){const secs=EX[S.exOpen]||[],n=secs.length,i=Math.max(0,Math.min(S.exSec,n-1)),s=secs[i];S.exSec=i;
-  return `<div class="scroll" id="sc"><div class="col ex"><div class="chap">${lamb(90)}<small style="margin-top:12px">${esc(exTitle())}</small><h1 style="font-size:38px">${esc(s?s.t:'')}</h1></div><div class="orn"><i></i><b></b><i></i></div>${s?s.h:''}<div class="pn"><button class="btn" id="xp" aria-label="Previous section" ${i?'':'disabled style="opacity:.4"'}>${ic('l')}</button><span style="color:var(--muted);align-self:center">${i+1} / ${n}</span><button class="btn" id="xn" ${i<n-1?'':'disabled style="opacity:.4"'}>Next</button></div></div></div><div class="rp ${S.rc?'c':''}" id="rp"><h3 style="margin-top:0">Contents</h3>${secs.map((x,j)=>`<button class="bk ${j===i?'on':''}" data-s="${j}">${esc(x.t)}</button>`).join('')}</div>`}
+  return `<div class="scroll" id="sc"><div class="col ex"><div class="chap">${lamb(90)}<small style="margin-top:12px">${esc(exTitle())}</small><h1 style="font-size:38px">${esc(s?s.t:'')}</h1></div><div class="orn"><i></i><b></b><i></i></div>${s?s.h:''}<div class="pn"><button class="btn" id="xp" aria-label="Previous section" ${i?'':'disabled style="opacity:.4"'}>${ic('l')}</button><span style="color:var(--muted);align-self:center">${i+1} / ${n}</span><button class="btn" id="xn" ${i<n-1?'':'disabled style="opacity:.4"'}>Next</button></div></div></div><div class="rp ${S.rc?'c':''}" id="rp"><h3 style="margin-top:0">Contents</h3>${secs.map((x,j)=>`<button class="bk ${j===i?'on':''}" data-s="${j}" style="padding-left:${6+(x.d||0)*14}px${x.d?';font-size:.92em':''}">${esc(x.t)}</button>`).join('')}</div>`}
  const list=S.items.filter(i=>i.kind==='ex');
  return `<div class="scroll"><div class="col"><br>${zone('Add extra-biblical texts','Apocrypha, early church writings, commentaries, devotionals. Accepts EPUB, TXT, Markdown or HTML.')}
  <div class="note">${ic('lock')}<span>Texts stay on this device. Your place in each one is remembered.</span></div>
