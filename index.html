@@ -171,7 +171,7 @@ p.v:first-of-type:not(:has(sup))::first-letter{font-size:3.2em;float:left;line-h
 .rf{text-decoration:underline;cursor:pointer}
 .cmp{display:flex;gap:8px;align-items:flex-end;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line)}
 .cmp textarea{flex:1;resize:none;max-height:140px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:10px 14px;font:inherit;font-size:17px;color:var(--ink);outline:0}
-.sb{display:none}
+.sb{display:none}.who{font-size:11px;color:var(--muted);margin:0 6px 2px}.mc{display:block;font-size:12px;color:var(--muted);font-weight:400}.frow input[type=checkbox]{flex:none}
 .av{overflow:hidden}.av img{width:100%;height:100%;object-fit:cover;display:block}
 .avb{border-radius:50%;flex:none;position:relative;cursor:pointer}.sme .av{width:56px;height:56px;font-size:24px}
 .chead{position:relative}
@@ -200,6 +200,7 @@ const LAMB="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAVQAAAGqCAYAAABUCrzcAA
 const $=s=>document.querySelector(s);
 const P={read:'<path d="M3 5c3-1 6-1 9 1 3-2 6-2 9-1v14c-3-1-6-1-9 1-3-2-6-2-9-1z"/><path d="M12 6v14"/>',search:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5"/>',marks:'<path d="M6 3h12v18l-6-4-6 4z"/>',plan:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',lib:'<path d="M4 4h4v16H4zM10 4h4v16h-4zM16.5 5l3.5-1 3 15-3.5 1z"/>',set:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>',l:'<path d="M15 6l-6 6 6 6"/>',r:'<path d="M9 6l6 6-6 6"/>',up:'<path d="M12 16V4M7 9l5-5 5 5M5 14v5h14v-5"/>',sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/>',moon:'<path d="M20 14a8 8 0 1 1-10-10 6 6 0 0 0 10 10z"/>',bm:'<path d="M6 3h12v18l-6-4-6 4z"/>',pen:'<path d="M4 20h4L19 9l-4-4L4 16z"/>',cp:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',tr:'<path d="M4 7h16M10 7v13M14 7c0 5 3 8 6 9M4 17c4-1 6-5 6-10"/>',ex:'<path d="M6 3h11a2 2 0 0 1 2 2v16H8a2 2 0 0 1-2-2zM6 19a2 2 0 0 1 2-2h11"/><path d="M10 8h5"/>',pal:'<path d="M12 3a9 9 0 1 0 0 18c1.5 0 2-1 1.5-2s0-2 1.5-2h2a3 3 0 0 0 3-3 9 9 0 0 0-8-11z"/><circle cx="8" cy="11" r="1"/><circle cx="12" cy="7" r="1"/><circle cx="16" cy="9" r="1"/>',pl:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/>',pr:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/>'};
 P.snd='<path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/>';P.usr='<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M17.5 14.2a5 5 0 0 1 4 4.8"/>';
+P.ao='<path d="M10.6 4.6L3.9 19.4M3.4 4.8v3.4c0 1.4.9 2.5 2.7 3.2M10.9 19.4v-3.4c0-1.4-.9-2.5-2.7-3.2"/><path d="M12.5 19.5h3.2v-1.6c-2-1.2-3-3-3-5.3a4.4 4.4 0 0 1 8.8 0c0 2.3-1 4.1-3 5.3v1.6h3.2"/>';
 const ic=k=>`<svg viewBox="0 0 24 24">${P[k]}</svg>`;
 const BN="Genesis,Exodus,Leviticus,Numbers,Deuteronomy,Joshua,Judges,Ruth,1 Samuel,2 Samuel,1 Kings,2 Kings,1 Chronicles,2 Chronicles,Ezra,Nehemiah,Esther,Job,Psalms,Proverbs,Ecclesiastes,Song of Solomon,Isaiah,Jeremiah,Lamentations,Ezekiel,Daniel,Hosea,Joel,Amos,Obadiah,Jonah,Micah,Nahum,Habakkuk,Zephaniah,Haggai,Zechariah,Malachi,Matthew,Mark,Luke,John,Acts,Romans,1 Corinthians,2 Corinthians,Galatians,Ephesians,Philippians,Colossians,1 Thessalonians,2 Thessalonians,1 Timothy,2 Timothy,Titus,Philemon,Hebrews,James,1 Peter,2 Peter,1 John,2 John,3 John,Jude,Revelation".split(',');
 const BC=[50,40,27,36,34,24,21,4,31,24,22,25,29,36,10,13,10,42,150,31,12,8,66,52,5,48,12,14,3,9,1,4,7,3,3,3,2,14,4,28,16,24,21,28,16,16,13,6,6,4,4,5,3,6,4,3,1,13,5,5,3,5,1,1,1,22];
@@ -227,7 +228,7 @@ const setTheme=t=>{document.documentElement.dataset.theme=t;try{localStorage.set
 const toast=t=>{const e=$('#ts');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),1500)};
 const key=v=>`${S.b}.${S.c}.${v}`;
 const lamb=w=>`<div class="lamb" style="--w:${w}px" role="img" aria-label="Agnus Dei illustration"><i></i></div>`;
-const NAV=[['read','read','Read'],['search','search','Search'],['marks','marks','Saved'],['plan','plan','Plans'],['lib','lib','Bibles & More'],['ex','ex','Extra-Biblical'],['gh','ex','Greek & Hebrew'],['soc','usr','Social'],['set','set','Settings']];
+const NAV=[['read','read','Read'],['search','search','Search'],['marks','marks','Saved'],['plan','plan','Plans'],['lib','lib','Bibles & More'],['ex','ex','Extra-Biblical'],['gh','ao','Greek & Hebrew'],['soc','usr','Social'],['set','set','Settings']];
 const THEMES=[['light','Light',['#fefae0','#6f1d1b','#432818']],['dark','Dark',['#432818','#6f1d1b','#fefae0']],['verdant','Verdant',['#344e41','#fefae0','#e9c9a0']],['nautical','Nautical',['#0D1C42','#22396F','#FCF1D0']],['lilac','Lilac',['#563979','#6C223F','#E4DFEB']]];
 const TITLES={read:'',search:'Search',marks:'Saved',plan:'Plans',lib:'Bibles & More',ex:'Extra-Biblical',gh:'Greek & Hebrew',soc:'Social',set:'Settings'};
 const trs=()=>S.items.filter(i=>i.kind==='tr');
@@ -728,17 +729,23 @@ const LOCDB={ // tiny stand-in for the server: shares data between tabs of this 
  on(p,cb,n){const l={p,n,cb,last:undefined};this.ls.push(l);setTimeout(()=>this.tick(l),0);return()=>{this.ls=this.ls.filter(x=>x!==l)}},
  tick(l){if(!this.ls.includes(l))return;const v=this.val(l.p,l.n),s=JSON.stringify(v);if(s!==l.last){l.last=s;l.cb(v)}},
  fire(){this.ls.slice().forEach(l=>this.tick(l))}};
-const SOC={prog:{},acct:null,si:false,ready:false,busy:false,mode:'',uid:'',db:null,me:null,friends:{},reqs:{},users:{},last:{},seen:{},msgs:[],cur:null,err:'',note:'',subs:{},read:{},loaded:false,bd:0,ed:false,nc:false};
+const SOC={groups:{},gm:{},ug:{},mm:null,prog:{},acct:null,si:false,ready:false,busy:false,mode:'',uid:'',db:null,me:null,friends:{},reqs:{},users:{},last:{},seen:{},msgs:[],cur:null,err:'',note:'',subs:{},read:{},loaded:false,bd:0,ed:false,nc:false};
 try{SOC.read=JSON.parse(localStorage.getItem('bib-socread')||'{}')}catch(e){}
 const socSub=(k,f)=>{if(!SOC.subs[k])SOC.subs[k]=f()};
 const socUnsub=k=>{if(SOC.subs[k]){try{SOC.subs[k]()}catch(e){}delete SOC.subs[k]}};
 const spair=f=>[SOC.uid,f].sort().join('_');
+const isG=k=>typeof k==='string'&&k.slice(0,2)==='g:',gidOf=k=>k.slice(2);
+const cpath=k=>isG(k)?'gchats/'+gidOf(k):'chats/'+spair(k);
+const gMembers=g=>Object.keys(SOC.gm[g]||{}),gOwner=k=>{const g=SOC.groups[gidOf(k)];return !!g&&g.owner===SOC.uid};
+const curOk=()=>!!SOC.cur&&(isG(SOC.cur)?!!SOC.groups[gidOf(SOC.cur)]:!!SOC.friends[SOC.cur]);
+const isMember=f=>Object.values(SOC.gm).some(g=>g&&g[f]);
+const hdrName=()=>esc(socName(SOC.cur))+(isG(SOC.cur)?'<small class="mc">'+gMembers(gidOf(SOC.cur)).length+' members</small>':'');
 const gcode=()=>{const A='ABCDEFGHJKMNPQRSTUVWXYZ23456789',r=new Uint8Array(8);(window.crypto||window.msCrypto).getRandomValues(r);let s='';r.forEach(x=>s+=A[x%A.length]);return s};
 const fmtCode=c=>c?c.slice(0,4)+'-'+c.slice(4):'';
-const socName=f=>(SOC.users[f]&&SOC.users[f].name)||(SOC.reqs[f]&&SOC.reqs[f].name)||'Friend';
+const socName=f=>isG(f)?((SOC.groups[gidOf(f)]||{}).name||'Group'):(SOC.users[f]&&SOC.users[f].name)||(SOC.reqs[f]&&SOC.reqs[f].name)||'Friend';
 const initial=n=>esc((n||'?').trim().charAt(0)||'?');
 const unread=f=>{const m=SOC.last[f];return !!(m&&m.f!==SOC.uid&&(m.ts||0)>(SOC.read[f]||0))};
-const socBadge=()=>{const n=Object.keys(SOC.reqs).length+Object.keys(SOC.friends).filter(f=>SOC.friends[f].st==='ok'&&unread(f)).length;return n>9?'9+':n||''};
+const socBadge=()=>{const n=Object.keys(SOC.reqs).length+Object.keys(SOC.friends).filter(f=>SOC.friends[f].st==='ok'&&unread(f)).length+Object.keys(SOC.groups).filter(g=>unread('g:'+g)).length;return n>9?'9+':n||''};
 const socNote=t=>{SOC.note=t;if(S.tab==='soc')socRefresh()};
 async function socConnect(){
  if(SOC.ready||SOC.busy)return;SOC.busy=true;SOC.err='';socRefresh();
@@ -748,23 +755,24 @@ async function socConnect(){
 function socWatch(){const d=SOC.db,u=SOC.uid;
  socSub('me',()=>d.on('users/'+u,v=>{SOC.me=v;socRefresh();if(S.tab==='plan')render()}));
  socSub('inbox',()=>d.on('inbox/'+u,v=>{SOC.reqs=v||{};Object.keys(SOC.reqs).forEach(f=>socSub('ru:'+f,()=>d.on('users/'+f,x=>{SOC.users[f]=x;socRefresh()})));Object.keys(SOC.subs).forEach(k=>{if(k.startsWith('ru:')&&!SOC.reqs[k.slice(3)])socUnsub(k)});socRefresh()}));
- socSub('friends',()=>d.on('friends/'+u,v=>{SOC.friends=v||{};socSync();SOC.loaded=true;socRefresh();if(S.tab==='plan')render()}));socPublish()}
+ socSub('friends',()=>d.on('friends/'+u,v=>{SOC.friends=v||{};socSync();SOC.loaded=true;socRefresh();if(S.tab==='plan')render()}));
+ socSub('ug',()=>d.on('userGroups/'+u,v=>{SOC.ug=v||{};socSyncG()}));socPublish()}
 function socSync(){const d=SOC.db,u=SOC.uid,F=SOC.friends;
  Object.keys(F).forEach(f=>{
   socSub('u:'+f,()=>d.on('users/'+f,v=>{SOC.users[f]=v;socRefresh()}));
   socSub('o:'+f,()=>d.on('friends/'+f+'/'+u,v=>socOther(f,v)));
-  if(F[f].st==='ok'){socSub('l:'+f,()=>d.on('chats/'+spair(f),v=>socLast(f,v),1));socSub('p:'+f,()=>d.on('progress/'+f,v=>{SOC.prog[f]=(v&&v.p)||null;if(S.tab==='plan')render()}))}});
- Object.keys(SOC.subs).forEach(k=>{const m=/^[uolp]:(.+)$/.exec(k);if(m&&!F[m[1]]){socUnsub(k);if(m[1]===SOC.cur)socClose()}})}
+  if(F[f].st==='ok'){socSub('l:'+f,()=>d.on(cpath(f),v=>socLast(f,v),1));socSub('p:'+f,()=>d.on('progress/'+f,v=>{SOC.prog[f]=(v&&v.p)||null;if(S.tab==='plan')render()}))}});
+ Object.keys(SOC.subs).forEach(k=>{const m=/^[uolp]:(.+)$/.exec(k);if(m&&!F[m[1]]&&!(k[0]==='u'&&isMember(m[1]))){socUnsub(k);if(m[1]===SOC.cur)socClose()}})}
 function socOther(f,v){const mine=SOC.friends[f];if(!mine)return;
  if(mine.st==='pending'&&v)SOC.db.update({['friends/'+SOC.uid+'/'+f]:{st:'ok',ts:mine.ts||Date.now()}}).catch(()=>{});
  else if(mine.st==='ok'&&!v)SOC.db.get('friends/'+f+'/'+SOC.uid).then(x=>{if(!x&&SOC.friends[f]&&SOC.friends[f].st==='ok')SOC.db.update({['friends/'+SOC.uid+'/'+f]:null})}).catch(()=>{})}
 function socLast(f,v){const m=v?Object.values(v)[0]:null,had=f in SOC.seen;SOC.last[f]=m;SOC.seen[f]=1;
  const viewing=SOC.cur===f&&S.tab==='soc';
- if(m&&m.f!==SOC.uid&&(m.ts||0)>(SOC.read[f]||0)){if(viewing)socMark();else if(had)toast('New message from '+socName(f))}
+ if(m&&m.f!==SOC.uid&&(m.ts||0)>(SOC.read[f]||0)){if(viewing)socMark();else if(had)toast(isG(f)?socName(f)+': new message':'New message from '+socName(f))}
  socRefresh()}
 function socMark(){const m=SOC.msgs[SOC.msgs.length-1],f=SOC.cur;if(!f)return;const l=SOC.last[f],ts=Math.max((m&&m.ts)||0,(l&&l.ts)||0);if(ts>(SOC.read[f]||0)){SOC.read[f]=ts;try{localStorage.setItem('bib-socread',JSON.stringify(SOC.read))}catch(e){}}}
 function socOpen(f){socUnsub('c');SOC.cur=f;SOC.msgs=[];
- SOC.subs.c=SOC.db.on('chats/'+spair(f),v=>{SOC.msgs=Object.keys(v||{}).sort().map(k=>v[k]);if(S.tab==='soc')socMark();socMsgs();socRefresh()},100);
+ SOC.subs.c=SOC.db.on(cpath(f),v=>{SOC.msgs=Object.keys(v||{}).sort().map(k=>v[k]);if(S.tab==='soc')socMark();socMsgs();socRefresh()},100);
  socRefresh(true)}
 function socClose(){socUnsub('c');SOC.cur=null;SOC.msgs=[];if(S.tab==='soc')socRefresh(true)}
 async function socCode(){for(let i=0;i<8;i++){const c=gcode();try{await SOC.db.set('codes/'+c,{uid:SOC.uid});return c}catch(e){}}throw new Error('code')}
@@ -786,15 +794,15 @@ const socAccept=f=>SOC.db.update({['friends/'+SOC.uid+'/'+f]:{st:'ok',ts:Date.no
 const socDecline=(f,block)=>SOC.db.update(Object.assign({['inbox/'+SOC.uid+'/'+f]:null},block?{['blocked/'+SOC.uid+'/'+f]:true}:{}));
 async function socRemove(f,block){const u=SOC.uid,ok=SOC.friends[f]&&SOC.friends[f].st==='ok',b=block?{['blocked/'+u+'/'+f]:true}:{};
  const min=Object.assign({['friends/'+u+'/'+f]:null,['inbox/'+f+'/'+u]:null},b);
- try{await SOC.db.update(ok?Object.assign({['chats/'+spair(f)]:null},min):min)}catch(e){try{await SOC.db.update(min)}catch(x){toast('Couldn’t remove that friend')}}
+ try{await SOC.db.update(ok?Object.assign({[cpath(f)]:null},min):min)}catch(e){try{await SOC.db.update(min)}catch(x){toast('Couldn’t remove that friend')}}
  if(SOC.cur===f)socClose()}
 function socSend(){const i=$('#sin');if(!i||!SOC.cur)return;const t=i.value.trim().slice(0,1000);if(!t)return;i.value='';i.style.height='';
- Promise.resolve(SOC.db.push('chats/'+spair(SOC.cur),{f:SOC.uid,t,ts:SOC.db.ts()})).catch(()=>{toast('Message not sent');if(!i.value)i.value=t})}
+ Promise.resolve(SOC.db.push(cpath(SOC.cur),{f:SOC.uid,t,ts:SOC.db.ts()})).catch(()=>{toast('Message not sent');if(!i.value)i.value=t})}
 const REFRE=new RegExp('\\b('+BN.slice().sort((a,b)=>b.length-a.length).concat(['Psalm']).map(n=>n.replace(/ /g,'\\s+')).join('|')+')\\s+(\\d{1,3})(?::(\\d{1,3})(?:[-–]\\d{1,3})?)?','gi');
 const socText=t=>esc(t).replace(REFRE,(m,n,c,v)=>{const b=bookIdx(n.replace(/\s+/g,' '));if(b<0||+c<1||+c>BC[b]||(!v&&n[0]!==n[0].toUpperCase()))return m;return `<a class="rf" data-r="${b}.${c}.${v||0}">${m}</a>`}).replace(/\n/g,'<br>');
 function socMsgs(){const el=$('#smsgs');if(!el)return;const near=!el.dataset.init||el.scrollHeight-el.scrollTop-el.clientHeight<90;let h='',ld='';
  SOC.msgs.forEach(m=>{const d=new Date(m.ts||Date.now()),ds=d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});if(ds!==ld){h+=`<div class="dsep">${ds}</div>`;ld=ds}
-  h+=`<div class="m ${m.f===SOC.uid?'me':'th'}">${socBody(m)}<small>${d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})}</small></div>`});
+  h+=`<div class="m ${m.f===SOC.uid?'me':'th'}">${isG(SOC.cur)&&m.f!==SOC.uid?'<small class="who">'+esc(socName(m.f))+'</small>':''}${socBody(m)}<small>${d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})}</small></div>`});
  el.innerHTML=h||'<div class="empty">Say hello. Type a verse like “John 3:16” and it becomes a link they can open in their own Bible.</div>';el.dataset.init=1;if(near)el.scrollTop=el.scrollHeight}
 function socLeft(){
  if(SOC.err)return `<div class="card"><div>${esc(SOC.err)}</div><br><button class="btn p" id="sretry">Try again</button></div>`;
@@ -810,11 +818,11 @@ function socLeft(){
  <h3>Add a friend</h3><div class="search"><input id="sa" placeholder="Their code, e.g. ABCD-2345" autocomplete="off" autocapitalize="characters" maxlength="12"></div><button class="btn p" id="sadd">Send request</button>${SOC.note?`<div class="note">${esc(SOC.note)}</div>`:''}
  ${R.length?`<h3>Requests (${R.length})</h3>`+R.map(([f,r])=>`<div class="rq">${avFor(f,r.name)}<div class="fm">${esc(r.name||'Someone')}<br><small style="color:var(--muted)">wants to be friends</small></div><button class="btn p" data-acc="${f}">Accept</button><button class="btn" data-dec="${f}">Decline</button><button class="lnk" data-blk="${f}">Block</button></div>`).join(''):''}
  <h3>Friends (${F.filter(x=>x[1].st==='ok').length})</h3>
- ${F.length?F.map(([f,x])=>{const nm=socName(f),l=SOC.last[f];return x.st==='ok'?`<button class="frow ${SOC.cur===f?'on':''}" data-f="${f}">${avFor(f)}<div class="fm"><b>${esc(nm)}</b><small>${l?(l.f===SOC.uid?'You: ':'')+esc(l.t||''):'No messages yet'}</small></div>${unread(f)?'<span class="ud" title="Unread"></span>':''}</button>`:`<div class="frow">${avFor(f)}<div class="fm"><b>${esc(nm)}</b><small>Request sent, waiting for them</small></div><button class="lnk" data-cx="${f}">Cancel</button></div>`}).join(''):'<div class="empty" style="padding:18px 0">No friends yet. Share your code, or enter a friend’s above.</div>'}${acctCard()}`}
+ ${F.length?F.map(([f,x])=>{const nm=socName(f),l=SOC.last[f];return x.st==='ok'?`<button class="frow ${SOC.cur===f?'on':''}" data-f="${f}">${avFor(f)}<div class="fm"><b>${esc(nm)}</b><small>${l?(l.f===SOC.uid?'You: ':'')+esc(l.t||''):'No messages yet'}</small></div>${unread(f)?'<span class="ud" title="Unread"></span>':''}</button>`:`<div class="frow">${avFor(f)}<div class="fm"><b>${esc(nm)}</b><small>Request sent, waiting for them</small></div><button class="lnk" data-cx="${f}">Cancel</button></div>`}).join(''):'<div class="empty" style="padding:18px 0">No friends yet. Share your code, or enter a friend’s above.</div>'}${groupsHtml()}${acctCard()}`}
 function socRight(){
- if(!SOC.cur||!SOC.friends[SOC.cur])return `<div class="empty" style="margin:auto">${lamb(110)}<br><br>Choose a friend to start talking.<div class="note" style="justify-content:center">${ic('lock')}<span>${SOC.mode==='preview'?'Preview messages stay on this device.':'Messages are stored on the chat server. Your Bible files are never uploaded.'}</span></div></div>`;
+ if(!curOk())return `<div class="empty" style="margin:auto">${lamb(110)}<br><br>Choose a friend or group to start talking.<div class="note" style="justify-content:center">${ic('lock')}<span>${SOC.mode==='preview'?'Preview messages stay on this device.':'Messages are stored on the chat server. Your Bible files are never uploaded.'}</span></div></div>`;
  const nm=socName(SOC.cur);
- return `<div class="chead"><button class="ibt sb" id="sback" title="Back">${ic('l')}</button>${avFor(SOC.cur)}<b>${esc(nm)}</b><button class="ibt" id="smenu" title="More options" aria-haspopup="true" aria-label="More options">⋯</button></div><div class="smsgs" id="smsgs"></div><div class="cmp"><button class="ibt" id="sref" title="Insert the verse you last selected (or the chapter you’re reading)">${ic('read')}</button><textarea id="sin" rows="1" maxlength="1000" placeholder="Message…"></textarea><button class="btn p" id="ssend" title="Send">${ic('snd')}</button></div>`}
+ return `<div class="chead"><button class="ibt sb" id="sback" title="Back">${ic('l')}</button>${avFor(SOC.cur)}<b>${hdrName()}</b><button class="ibt" id="smenu" title="More options" aria-haspopup="true" aria-label="More options">⋯</button></div><div class="smsgs" id="smsgs"></div><div class="cmp"><button class="ibt" id="sref" title="Insert the verse you last selected (or the chapter you’re reading)">${ic('read')}</button><button class="ibt" id="sbk" title="Share a book from your Extra-Biblical library" aria-label="Share a book">${ic('ex')}</button><textarea id="sin" rows="1" maxlength="1000" placeholder="Message…"></textarea><button class="btn p" id="ssend" title="Send">${ic('snd')}</button></div>`}
 function social(){if(!SOC.ready&&!SOC.busy&&!SOC.err)socConnect();return `<div class="soc ${SOC.cur?'co':''}" id="soc"><div class="soc-l" id="sl">${socLeft()}</div><div class="soc-r" id="sr">${socRight()}</div></div>`}
 
 /* ---- shared plans, verse cards, account backup ---- */
@@ -835,15 +843,16 @@ function planBind(){
  document.querySelectorAll('[data-psh]').forEach(b=>b.onclick=()=>{const st=S.plans[b.dataset.psh];st.share=!st.share;savePlans();render()});
  document.querySelectorAll('[data-pinv]').forEach(b=>b.onclick=()=>{S.pinv=S.pinv===b.dataset.pinv?null:b.dataset.pinv;render()});
  document.querySelectorAll('[data-pto]').forEach(b=>b.onclick=()=>{const[i,f]=b.dataset.pto.split('|'),p=PL(i);S.pinv=null;
-  Promise.resolve(SOC.db.push('chats/'+spair(f),{f:SOC.uid,t:'Join me: '+p.name,ts:SOC.db.ts(),p:{i,n:p.name,d:p.days}})).then(()=>toast('Invitation sent to '+socName(f))).catch(()=>toast('Couldn’t send the invitation'));render()})}
+  Promise.resolve(SOC.db.push(cpath(f),{f:SOC.uid,t:'Join me: '+p.name,ts:SOC.db.ts(),p:{i,n:p.name,d:p.days}})).then(()=>toast('Invitation sent to '+socName(f))).catch(()=>toast('Couldn’t send the invitation'));render()})}
 const socBody=m=>{
  if(m.v){const v=m.v;return `<div class="mb vcard"><a class="rf" data-r="${esc(v.o||'')}">${esc(v.r||m.t||'')}</a>${v.x?`<div class="vx">${esc(v.x)}</div>`:''}${v.n?`<div class="vn">${socText(v.n)}</div>`:''}${v.tr?`<small>${esc(v.tr)}</small>`:''}</div>`}
  if(m.p){const p=m.p;return `<div class="mb pcard"><small>Reading plan invitation</small><b style="font-weight:400;font-size:1.05em">${esc(p.n||'')}</b><small>${+p.d||0} days</small>${m.f!==SOC.uid&&PL(p.i)?(S.plans[p.i]?'<small>You’re already on this plan</small>':`<button class="btn p" data-join="${esc(p.i)}">Start this plan</button>`):''}</div>`}
+ if(m.b&&sidOk(m.b.s)){const b=m.b,mine=m.f===SOC.uid,have=S.items.find(i=>i.sid===b.s);return `<div class="mb pcard"><small>Shared book</small><b style="font-weight:400;font-size:1.05em">${esc(b.t||'Book')}</b><small>${+b.n||0} sections · ${+b.k||0} KB</small>${mine?`<button class="btn" data-bstop="${esc(b.s)}">Stop sharing</button>`:have?'<small>In your Extra-Biblical library</small>':`<button class="btn p" data-bk="${esc(b.s)}">Add to my library</button>`}</div>`}
  return `<div class="mb">${socText(m.t||'')}</div>`};
 function socShare(){const vs=selv();if(!vs.length)return;
  if(!SOC.ready&&!SOC.busy&&!SOC.err)socConnect();
  const ref=BOOKS[S.b].n+' '+S.c+':'+vlabel(vs),note=vs.map(v=>S.notes[key(v)]).filter(Boolean).join(' ');
- const ok=SOC.me?Object.keys(SOC.friends).filter(f=>SOC.friends[f].st==='ok'):[];
+ const ok=SOC.me?Object.keys(SOC.friends).filter(f=>SOC.friends[f].st==='ok').concat(Object.keys(SOC.groups).map(g=>'g:'+g)):[];
  const m=document.createElement('div');m.className='shm';m.id='shm';
  m.innerHTML=`<div class="shc"><h3 style="margin-top:0">Send ${esc(ref)}</h3>`+(ok.length?`${act()?`<div class="row2" style="font-size:16px"><span>Include the verse text<br><small style="color:var(--muted)">${esc(verName())}</small></span><span class="tg on" id="shx" role="switch" tabindex="0" aria-checked="true"></span></div>`:''}${note?`<div class="row2" style="font-size:16px"><span>Include my note</span><span class="tg on" id="shn" role="switch" tabindex="0" aria-checked="true"></span></div>`:''}<h3>Send to</h3>${ok.map(f=>`<button class="frow" data-sh="${f}">${avFor(f)}<div class="fm"><b>${esc(socName(f))}</b></div></button>`).join('')}`:`<div class="empty" style="padding:14px 0">${!SOC.ready?'Connecting to Social… try again in a moment.':SOC.me?'You have no friends added yet.':'Set up the Social tab first.'}</div><button class="btn p" id="shg">Open Social</button>`)+`<br><br><button class="btn" id="shc">Close</button></div>`;
  document.body.appendChild(m);
@@ -854,7 +863,7 @@ function socShare(){const vs=selv();if(!vs.length)return;
   if(act())v.tr=verName().slice(0,80);
   if(sx&&sx.classList.contains('on')){const x=dec(vs.map(n=>verseText(S.b,S.c,n)).join(' ')).trim().slice(0,1200);if(x)v.x=x}
   if(sn&&sn.classList.contains('on')&&note)v.n=note.slice(0,600);
-  Promise.resolve(SOC.db.push('chats/'+spair(f),{f:SOC.uid,t:ref,ts:SOC.db.ts(),v})).then(()=>toast('Sent to '+socName(f))).catch(()=>toast('Couldn’t send'));close()})}
+  Promise.resolve(SOC.db.push(cpath(f),{f:SOC.uid,t:ref,ts:SOC.db.ts(),v})).then(()=>toast('Sent to '+socName(f))).catch(()=>toast('Couldn’t send'));close()})}
 const socAuthErr=e=>{const c=String(e&&e.code||e);return /weak-password/.test(c)?'Use a password with at least 6 characters.':/invalid-email/.test(c)?'That email address doesn’t look right.':/email-already-in-use|credential-already-in-use/.test(c)?'That email is already in use. Use “Sign in” instead.':/wrong-password|invalid-credential|user-not-found/.test(c)?'Email or password isn’t right.':/operation-not-allowed/.test(c)?'Email sign-in isn’t switched on in Firebase yet (see SOCIAL_SETUP.md).':/too-many/.test(c)?'Too many tries. Please wait a bit.':'That didn’t work. Please try again.'};
 const socErr=x=>{const m=socAuthErr(x);toast(m);socNote(m)};
 const acctVals=()=>[(($('#se')||{}).value||'').trim(),($('#sp')||{}).value||''];
@@ -871,7 +880,7 @@ function signCard(){if(SOC.mode!=='live')return '';
 
 /* ---- photos + confirmations ---- */
 const picOk=s=>typeof s==='string'&&s.length<14000&&/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(s);
-const avFor=(f,nm)=>{const p=f===SOC.uid?SOC.me:SOC.users[f],n=nm||(f===SOC.uid?(SOC.me&&SOC.me.name):socName(f));return p&&picOk(p.pic)?`<div class="av"><img src="${p.pic}" alt=""></div>`:`<div class="av">${initial(n)}</div>`};
+const avFor=(f,nm)=>{if(isG(f))return '<div class="av">'+ic('usr')+'</div>';const p=f===SOC.uid?SOC.me:SOC.users[f],n=nm||(f===SOC.uid?(SOC.me&&SOC.me.name):socName(f));return p&&picOk(p.pic)?`<div class="av"><img src="${p.pic}" alt=""></div>`:`<div class="av">${initial(n)}</div>`};
 function socConfirm(title,body,label,fn){const m=document.createElement('div');m.className='shm';
  m.innerHTML=`<div class="shc" role="dialog" aria-modal="true"><h3 style="margin-top:0">${esc(title)}</h3><div class="note" style="margin:0 0 18px;font-size:16px">${esc(body)}</div><div class="srow"><button class="btn p" id="cno">Cancel</button><button class="btn dg" id="cyes">${esc(label)}</button></div></div>`;
  document.body.appendChild(m);const c=()=>m.remove();m.onclick=e=>{if(e.target===m)c()};m.querySelector('#cno').onclick=c;m.querySelector('#cyes').onclick=()=>{c();fn()};m.querySelector('#cno').focus()}
@@ -895,6 +904,73 @@ document.body.insertAdjacentHTML('beforeend','<input type="file" id="spic" accep
 $('#spic').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)socCrop(f)};
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.shm,#spop').forEach(x=>x.remove())});
 const acctLine=()=>SOC.mode==='live'&&SOC.acct&&!SOC.acct.anon?`<div class="note" style="margin-top:10px">Signed in as ${esc(SOC.acct.email)} · <button class="lnk" data-s="so" style="margin:0">Sign out</button></div>`:'';
+
+/* ===== groups ===== */
+const rid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+function socModal(html,mount){const m=document.createElement('div');m.className='shm';m.innerHTML='<div class="shc" role="dialog" aria-modal="true">'+html+'</div>';document.body.appendChild(m);const c=()=>m.remove();m.onclick=e=>{if(e.target===m)c()};if(mount)mount(m,c);return m}
+function socSyncG(){const d=SOC.db,u=SOC.uid,G=SOC.ug;
+ Object.keys(G).forEach(g=>{
+  socSub('G:'+g,()=>d.on('groups/'+g,v=>{if(v)SOC.groups[g]=v;else delete SOC.groups[g];socRefresh()}));
+  socSub('M:'+g,()=>d.on('groupMembers/'+g,v=>{SOC.gm[g]=v||{};Object.keys(v||{}).forEach(f=>{if(f!==u)socSub('u:'+f,()=>d.on('users/'+f,x=>{SOC.users[f]=x;socRefresh()}))});socRedrawMem(g);socRefresh()}));
+  socSub('L:'+g,()=>d.on('gchats/'+g,v=>socLast('g:'+g,v),1))});
+ Object.keys(SOC.subs).forEach(k=>{const m=/^[GML]:(.+)$/.exec(k);if(m&&!G[m[1]]){socUnsub(k);delete SOC.groups[m[1]];delete SOC.gm[m[1]];delete SOC.last['g:'+m[1]];if(SOC.cur==='g:'+m[1])socClose()}});socRefresh()}
+const groupsHtml=()=>{const G=Object.keys(SOC.groups).sort((a,b)=>((SOC.last['g:'+b]||{}).ts||0)-((SOC.last['g:'+a]||{}).ts||0)),any=Object.keys(SOC.friends).some(f=>SOC.friends[f].st==='ok');
+ return `<h3>Groups (${G.length})</h3>`+(G.length?G.map(g=>{const k='g:'+g,l=SOC.last[k];return `<button class="frow ${SOC.cur===k?'on':''}" data-f="${k}">${avFor(k)}<div class="fm"><b>${esc(SOC.groups[g].name)}</b><small>${l?(l.f===SOC.uid?'You: ':esc(socName(l.f))+': ')+esc(l.t||''):gMembers(g).length+' members'}</small></div>${unread(k)?'<span class="ud" title="Unread"></span>':''}</button>`}).join(''):'<div class="empty" style="padding:12px 0">No groups yet.</div>')+(any?'<button class="btn" id="sng" style="margin-top:8px">New group…</button>':'<div class="note">Add a friend first, then you can start a group.</div>')};
+function socNewGroup(){const fr=Object.keys(SOC.friends).filter(f=>SOC.friends[f].st==='ok');
+ socModal(`<h3 style="margin-top:0">New group</h3><div class="search"><input id="gnm" maxlength="40" placeholder="Group name" autocomplete="off"></div><h3>Add friends</h3>${fr.map(f=>`<label class="frow"><input type="checkbox" value="${f}" style="width:20px;height:20px;accent-color:var(--acc)">${avFor(f)}<div class="fm"><b>${esc(socName(f))}</b></div></label>`).join('')}<div class="srow" style="margin-top:14px"><button class="btn p" id="gok">Create group</button><button class="btn" id="gno">Cancel</button></div>`,(m,c)=>{
+  m.querySelector('#gno').onclick=c;m.querySelector('#gnm').focus();
+  m.querySelector('#gok').onclick=async()=>{const name=m.querySelector('#gnm').value.trim().slice(0,40),sel=[...m.querySelectorAll('input[type=checkbox]:checked')].map(x=>x.value).slice(0,29);if(!name)return toast('Give the group a name');if(!sel.length)return toast('Choose at least one friend');c();await socCreateG(name,sel)}})}
+async function socCreateG(name,sel){const g=rid(),u=SOC.uid,ts=Date.now();
+ try{await SOC.db.update({['groups/'+g]:{name,owner:u,ts}});
+  const up={['groupMembers/'+g+'/'+u]:{ts},['userGroups/'+u+'/'+g]:true};sel.forEach(f=>{up['groupMembers/'+g+'/'+f]={ts};up['userGroups/'+f+'/'+g]=true});
+  await SOC.db.update(up);toast('Group created');socOpen('g:'+g)}catch(e){toast('Couldn’t create the group')}}
+function memDraw(g){const gr=SOC.groups[g];if(!gr)return '<div class="empty">This group no longer exists.</div>';const own=gr.owner===SOC.uid,mem=gMembers(g),cand=Object.keys(SOC.friends).filter(f=>SOC.friends[f].st==='ok'&&!mem.includes(f));
+ return `<h3 style="margin-top:0">${esc(gr.name)}</h3>${own?`<div class="search"><input id="grn" maxlength="40" value="${esc(gr.name)}"></div><button class="btn" id="grs">Rename</button>`:''}<h3>Members (${mem.length})</h3>${mem.map(f=>`<div class="rq">${avFor(f)}<div class="fm">${esc(f===SOC.uid?'You':socName(f))}${f===gr.owner?' <span class="tag">owner</span>':''}</div>${own&&f!==SOC.uid?`<button class="lnk" data-rm="${f}">Remove</button>`:''}</div>`).join('')}${own&&cand.length&&mem.length<30?`<h3>Add friends</h3>${cand.map(f=>`<div class="rq">${avFor(f)}<div class="fm">${esc(socName(f))}</div><button class="btn" data-ad="${f}">Add</button></div>`).join('')}`:''}<div class="srow" style="margin-top:14px"><button class="btn" id="gcl">Close</button></div>`}
+function memBind(m,g){const q=m.querySelector.bind(m),ts=Date.now();q('#gcl').onclick=()=>m.remove();
+ if(q('#grs'))q('#grs').onclick=()=>{const n=q('#grn').value.trim().slice(0,40);if(n)SOC.db.update({['groups/'+g+'/name']:n}).then(()=>toast('Renamed')).catch(()=>toast('Couldn’t rename'))};
+ m.querySelectorAll('[data-ad]').forEach(b=>b.onclick=()=>{const f=b.dataset.ad;SOC.db.update({['groupMembers/'+g+'/'+f]:{ts},['userGroups/'+f+'/'+g]:true}).catch(()=>toast('Couldn’t add them'))});
+ m.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{const f=b.dataset.rm;SOC.db.update({['groupMembers/'+g+'/'+f]:null,['userGroups/'+f+'/'+g]:null}).catch(()=>toast('Couldn’t remove them'))})}
+function socMembers(g){if(!SOC.groups[g])return;const m=socModal(memDraw(g));m.dataset.g=g;SOC.mm=m;memBind(m,g)}
+function socRedrawMem(g){const m=SOC.mm;if(!m||!m.isConnected||m.dataset.g!==g)return;m.querySelector('.shc').innerHTML=memDraw(g);memBind(m,g)}
+async function socLeaveG(g){const u=SOC.uid;try{await SOC.db.update({['groupMembers/'+g+'/'+u]:null,['userGroups/'+u+'/'+g]:null});toast('You left the group');if(SOC.cur==='g:'+g)socClose()}catch(e){toast('Couldn’t leave the group')}}
+async function socDeleteG(g){const up={['groups/'+g]:null,['groupMembers/'+g]:null,['gchats/'+g]:null};gMembers(g).forEach(f=>up['userGroups/'+f+'/'+g]=null);
+ try{await SOC.db.update(up);toast('Group deleted');if(SOC.cur==='g:'+g)socClose()}catch(e){toast('Couldn’t delete the group')}}
+/* ===== sharing books through chats ===== */
+const sidOk=s=>/^[A-Za-z0-9_-]{8,40}$/.test(s||'');
+const b64enc=u=>{let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s)};
+const b64dec=s=>{const b=atob(s),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u};
+async function gzS(str){const u=new TextEncoder().encode(str);if(typeof CompressionStream!=='undefined'){const r=new Response(new Blob([u]).stream().pipeThrough(new CompressionStream('gzip')));return{b64:b64enc(new Uint8Array(await r.arrayBuffer())),z:1}}return{b64:b64enc(u),z:0}}
+async function gunS(b64,z){const u=b64dec(b64);if(!z)return new TextDecoder().decode(u);if(typeof DecompressionStream==='undefined')throw new Error('nodec');return await new Response(new Blob([u]).stream().pipeThrough(new DecompressionStream('gzip'))).text()}
+const OKT=new Set('p h1 h2 h3 h4 h5 h6 blockquote ul ol li dl dt dd table tr td th pre hr figure figcaption i b u s del sup sub code br img'.split(' '));
+function safeH(n){let o='';n.childNodes.forEach(c=>{if(c.nodeType===3){o+=esc(c.textContent);return}if(c.nodeType!==1)return;const t=c.tagName.toLowerCase();
+ if(t==='br'){o+='<br>';return}if(t==='hr'){o+='<hr>';return}
+ if(t==='img'){const s=c.getAttribute('src')||'';if(s.length<1.8e6&&/^data:image\/(png|jpeg|gif|webp);base64,[A-Za-z0-9+\/=]+$/.test(s))o+='<img src="'+s+'" alt="'+esc(c.getAttribute('alt')||'').replace(/"/g,'&quot;')+'">';return}
+ if(!OKT.has(t)){if(!/^(script|style|iframe|object|embed|svg|math|link|meta|form|input|button|textarea|select)$/.test(t))o+=safeH(c);return}
+ let at='';if(t==='p'||t==='dt'||t==='figcaption'){const k=(c.getAttribute('class')||'').split(/\s+/).filter(x=>/^(ctr|rgt|ind)$/.test(x));if(k.length)at=' class="'+k.join(' ')+'"'}
+ if(t==='td'||t==='th'){const cs=parseInt(c.getAttribute('colspan')),rs=parseInt(c.getAttribute('rowspan'));if(cs>1&&cs<20)at+=' colspan="'+cs+'"';if(rs>1&&rs<20)at+=' rowspan="'+rs+'"'}
+ o+='<'+t+at+'>'+safeH(c)+'</'+t+'>'});return o}
+function socBookPick(){const tgt=SOC.cur;if(!tgt||!curOk())return;const lib=S.items.filter(i=>i.kind==='ex');
+ socModal(`<h3 style="margin-top:0">Share a book with ${esc(socName(tgt))}</h3>${lib.length?`<div class="note" style="margin:0 0 10px">They’ll be able to add a copy to their own library. Only share texts you have the right to share, such as public-domain works or your own writing.</div>${lib.map(i=>`<button class="frow" data-bs="${i.id}"><div class="spine" style="width:30px;height:42px">${ic('ex')}</div><div class="fm"><b>${esc(i.name)}</b><small>${i.sections||0} sections · ${fmt(i.size)}</small></div></button>`).join('')}`:'<div class="empty">Your Extra-Biblical library is empty. Add a book there first.</div>'}<div class="srow" style="margin-top:12px"><button class="btn" id="bno">Close</button></div>`,(m,c)=>{m.querySelector('#bno').onclick=c;m.querySelectorAll('[data-bs]').forEach(b=>b.onclick=()=>{c();socUploadBook(S.items.find(i=>i.id===b.dataset.bs),tgt)})})}
+async function socUploadBook(it,tgt){if(!it)return;toast('Preparing “'+it.name+'”…');
+ try{const secs=EX[it.id]||await idbGet('ex:'+it.id);if(!secs||!secs.length)throw new Error('missing');
+  const g=await gzS(JSON.stringify(secs));if(g.b64.length>8e6)throw new Error('big');
+  const sid=rid()+rid(),chunks=[];for(let i=0;i<g.b64.length;i+=200000)chunks.push(g.b64.slice(i,i+200000));
+  const to=isG(tgt)?gMembers(gidOf(tgt)).filter(x=>x!==SOC.uid):[tgt],kb=Math.round(g.b64.length*.75/1024),title=it.name.slice(0,80);
+  const up={['shares/'+sid+'/m']:{o:SOC.uid,t:title,n:secs.length,k:kb,z:g.z,c:chunks.length,ts:SOC.db.ts()}};
+  to.forEach(u=>up['shares/'+sid+'/acl/'+u]=true);chunks.forEach((c,i)=>up['shares/'+sid+'/c/'+i]=c);
+  toast('Uploading…');await SOC.db.update(up);
+  await SOC.db.push(cpath(tgt),{f:SOC.uid,t:'Shared a book: '+title,ts:SOC.db.ts(),b:{s:sid,t:title,n:secs.length,k:kb}});toast('Shared “'+title+'”')}
+ catch(e){toast(String(e&&e.message)==='big'?'That book is too large to share (limit about 6 MB compressed).':'Couldn’t share that book')}}
+async function socBookGet(sid){if(!sidOk(sid))return;const msg=SOC.msgs.find(x=>x.b&&x.b.s===sid);if(!msg)return;if(S.items.some(i=>i.sid===sid))return toast('Already in your library');
+ try{toast('Downloading…');const m=await SOC.db.get('shares/'+sid+'/m');if(!m)return toast('That book isn’t shared any more');
+  const c=await SOC.db.get('shares/'+sid+'/c');if(!c)return toast('That book isn’t shared any more');
+  const parts=Array.isArray(c)?c:Object.keys(c).sort((a,b)=>a-b).map(k=>c[k]);if(parts.length>60||parts.some(p=>typeof p!=='string'))throw new Error('bad');
+  const raw=JSON.parse(await gunS(parts.join(''),m.z));if(!Array.isArray(raw)||raw.length>2000)throw new Error('bad');
+  const secs=raw.map(s=>({t:String((s&&s.t)||'Section').slice(0,80),h:safeH(dom(String((s&&s.h)||'')).body),d:Math.max(0,Math.min(3,+(s&&s.d)||0))}));
+  const it={id:'u'+Date.now()+Math.random().toString(36).slice(2,6),kind:'ex',name:String(m.t||msg.b.t||'Shared book').slice(0,80),ext:'shared',size:(+m.k||0)*1024,sections:secs.length,saved:true,sid,from:socName(msg.f)};
+  EX[it.id]=secs;await idbSet('ex:'+it.id,secs);S.items.push(it);save();socMsgs();toast('Added “'+it.name+'” to your Extra-Biblical library')}
+ catch(e){toast(String(e&&e.message)==='nodec'?'Your browser can’t open shared books yet. Please update it.':'Couldn’t download that book')}}
+async function socBookStop(sid){if(!sidOk(sid))return;try{await SOC.db.update({['shares/'+sid]:null});toast('Stopped sharing. Friends who already added it keep their copy.')}catch(e){toast('Couldn’t stop sharing')}}
 function socRefresh(fr){const b=socBadge();if(b!==SOC.bd){SOC.bd=b;side()}
  if(S.tab!=='soc')return;const l=$('#sl');if(!l)return;
  const a=document.activeElement,id=a&&a.id,ss=a&&a.selectionStart,IDS=['sa','snm','sn','se','sp'],sv={};IDS.forEach(i=>{if($('#'+i))sv[i]=$('#'+i).value});
@@ -902,14 +978,15 @@ function socRefresh(fr){const b=socBadge();if(b!==SOC.bd){SOC.bd=b;side()}
  IDS.forEach(i=>{if($('#'+i)&&i in sv)$('#'+i).value=sv[i]});
  if(id&&IDS.includes(id)&&$('#'+id)){$('#'+id).focus();try{$('#'+id).setSelectionRange(ss,ss)}catch(e){}}
  const so=$('#soc');if(so)so.classList.toggle('co',!!SOC.cur);
- const has=!!$('#smsgs'),want=!!(SOC.cur&&SOC.friends[SOC.cur]);
+ const has=!!$('#smsgs'),want=curOk();
  if(fr||has!==want){$('#sr').innerHTML=socRight();socBindR();socMsgs()}
- else if(want){const h=$('#sr .chead b');if(h)h.textContent=socName(SOC.cur)}}
+ else if(want){const h=$('#sr .chead b');if(h)h.innerHTML=hdrName()}}
 function socBind(){socBindL();socBindR();socMsgs()}
 function socBindL(){const q=(s,f)=>document.querySelectorAll('#sl '+s).forEach(f);
  if($('#sretry'))$('#sretry').onclick=()=>{SOC.err='';socConnect()};
  if($('#scr'))$('#scr').onclick=()=>socCreate($('#snm').value);
  if($('#snm'))$('#snm').onkeydown=e=>{if(e.key==='Enter')socCreate(e.target.value)};
+ if($('#sng'))$('#sng').onclick=socNewGroup;
  if($('#sadd'))$('#sadd').onclick=()=>socAdd($('#sa').value);
  if($('#sa'))$('#sa').onkeydown=e=>{if(e.key==='Enter')socAdd(e.target.value)};
  q('[data-f]',b=>b.onclick=()=>socOpen(b.dataset.f));
@@ -926,18 +1003,23 @@ function socBindL(){const q=(s,f)=>document.querySelectorAll('#sl '+s).forEach(f
 function socBindR(){
  if($('#sback'))$('#sback').onclick=()=>socClose();
  if($('#smenu'))$('#smenu').onclick=e=>{e.stopPropagation();const old=$('#spop');if(old){old.remove();return}
-  const p=document.createElement('div');p.className='pop';p.id='spop';p.innerHTML='<button data-m="rm">Remove friend…</button><button data-m="bl">Block…</button>';$('#sr .chead').appendChild(p);
+  const p=document.createElement('div');p.className='pop';p.id='spop';p.innerHTML=isG(SOC.cur)?'<button data-m="mem">Members…</button>'+(gOwner(SOC.cur)?'<button data-m="del">Delete group…</button>':'<button data-m="lv">Leave group…</button>'):'<button data-m="rm">Remove friend…</button><button data-m="bl">Block…</button>';$('#sr .chead').appendChild(p);
   const f=SOC.cur,nm=socName(f);
   p.onclick=ev=>{const m=ev.target.dataset.m;p.remove();
+   if(m==='mem')return socMembers(gidOf(f));
+   if(m==='lv')return socConfirm('Leave '+nm+'?','You’ll stop receiving messages from this group. Someone will need to add you again to rejoin.','Leave',()=>socLeaveG(gidOf(f)));
+   if(m==='del')return socConfirm('Delete '+nm+'?','The group and all of its messages will be deleted for everyone.','Delete',()=>socDeleteG(gidOf(f)));
    if(m==='rm')socConfirm('Remove '+nm+'?','You’ll stop being friends, and your chat history with them will be deleted.','Remove',()=>socRemove(f,false));
    if(m==='bl')socConfirm('Block '+nm+'?','They’ll be removed as a friend, your chat will be deleted, and they won’t be able to send you requests.','Block',()=>socRemove(f,true))};
   setTimeout(()=>document.addEventListener('click',()=>{const x=$('#spop');if(x)x.remove()},{once:true}),0)};
  if($('#ssend'))$('#ssend').onclick=socSend;
+ if($('#sbk'))$('#sbk').onclick=socBookPick;
  const i=$('#sin');if(i){i.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();socSend()}};i.oninput=()=>{i.style.height='auto';i.style.height=Math.min(i.scrollHeight,140)+'px'}}
  if($('#sref'))$('#sref').onclick=()=>{let b=S.b,c=S.c,vs=selv();if(!vs.length&&S.pick&&S.pick.vs.length){b=S.pick.b;c=S.pick.c;vs=S.pick.vs}
   const ref=BOOKS[b].n+' '+c+(vs.length?':'+vlabel(vs):'');i.value+=(i.value&&!/\s$/.test(i.value)?' ':'')+ref;i.dispatchEvent(new Event('input'));i.focus();toast(vs.length?'Inserted '+ref:'Inserted '+ref+' (the chapter you’re reading)')};
  if($('#smsgs'))$('#smsgs').onclick=e=>{
   const j=e.target.closest('[data-join]');if(j){const id=j.dataset.join;if(PL(id)&&!S.plans[id]){S.plans[id]={start:iso(new Date()),done:{},log:[]};savePlans();toast('Plan started. Find it under Plans.');socMsgs()}return}
+  const bg=e.target.closest('[data-bk]');if(bg){socBookGet(bg.dataset.bk);return}const bs=e.target.closest('[data-bstop]');if(bs){socBookStop(bs.dataset.bstop);return}
   const a=e.target.closest('.rf');if(!a)return;const[b,c,v]=a.dataset.r.split('.').map(Number);if(!(b>=0&&b<66&&c>=1&&c<=BC[b]))return;S.b=b;S.c=c;S.sel=v||null;S.ex2=[];S.tab='read';render()}}
 
 function render(){try{localStorage.setItem('bib-ver',S.ver)}catch(e){}
