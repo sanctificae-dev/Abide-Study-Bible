@@ -184,6 +184,19 @@ p.v:first-of-type:not(:has(sup))::first-letter{font-size:3.2em;float:left;line-h
 .vx{font-style:italic;line-height:1.5}.vn{opacity:.85;font-size:.92em;border-top:1px solid #8884;padding-top:6px}
 .vcard small,.pcard small{opacity:.75;margin:0}.pcard{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
 .soc .search{margin:0 0 8px}.soc .note{margin:6px 0 0}
+
+.ip{width:min(420px,40vw);min-width:320px;flex:none;border-left:1px solid var(--line);overflow-y:auto;background:var(--side);padding-bottom:24px}
+.iph{display:flex;align-items:center;gap:10px;padding:12px 16px;position:sticky;top:0;background:var(--side);border-bottom:1px solid var(--line);z-index:2}
+.iph b{font-weight:400;font-size:18px;color:var(--acc)}.iph small{color:var(--muted)}
+.ilo{display:flex;gap:16px;flex-wrap:wrap;padding:8px 16px;font-size:14px;color:var(--muted);border-bottom:1px solid var(--line)}
+.ilo label{display:flex;gap:6px;align-items:center;cursor:pointer}.ilo input{accent-color:var(--acc)}
+.ilv{padding:12px 16px;border-bottom:1px solid var(--line);cursor:pointer}.ilv:hover{background:var(--line)}.ilv.on{background:var(--card);box-shadow:inset 3px 0 0 var(--acc)}
+.ven{font-size:15px;line-height:1.45;margin-bottom:8px}.ven b{color:var(--acc);font-weight:400;margin-right:6px}
+.wl{display:flex;flex-wrap:wrap;gap:6px 12px}.ilv.he .wl{direction:rtl}
+.wd{display:flex;flex-direction:column;align-items:center;text-align:center;min-width:30px}
+.wo{font-size:22px;line-height:1.3;font-family:"SBL Hebrew","SBL Greek","Ezra SIL","Cardo","Gentium Plus","Times New Roman","DejaVu Serif",serif}
+.wt{font-size:12px;font-style:italic;color:var(--muted)}.wg{font-size:13px}.ws{font-size:10px;color:var(--muted);letter-spacing:.04em}
+@media(max-width:900px){.ip{position:fixed;left:0;right:0;bottom:0;width:100%;min-width:0;max-height:62vh;z-index:9;border:0;border-top:1px solid var(--line);border-radius:20px 20px 0 0;box-shadow:0 -8px 30px #0004;padding-bottom:env(safe-area-inset-bottom,0px)}}
 @media(max-width:900px){.soc{grid-template-columns:1fr}.soc .soc-r{display:none}.soc.co .soc-l{display:none}.soc.co .soc-r{display:flex}.sb{display:grid}.soc-l{border:0;padding:14px}.bdg{top:0;right:0}}
 </style><script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){})}</script>
 </head>
@@ -218,7 +231,7 @@ try{S.plans=JSON.parse(localStorage.getItem('bib-plans')||'{}')}catch(e){S.plans
 try{const u=JSON.parse(localStorage.getItem('bib-user')||'{}');['hl','bm','notes'].forEach(k=>{if(u[k])S[k]=u[k]});if(u.fs)S.fs=u.fs;if(u.vm!==undefined)S.vm=u.vm;S.cont=!!u.cont;S.para=!!u.para;if(u.b>=0&&u.b<66){S.b=u.b;S.c=u.c||1}document.documentElement.style.setProperty('--fs',S.fs+'px')}catch(e){}
 try{if(matchMedia('(max-width:900px)').matches&&!localStorage.getItem('bib-m2')){S.cont=true;localStorage.setItem('bib-m2','1')}}catch(e){}
 const persist=()=>{try{localStorage.setItem('bib-user',JSON.stringify({hl:S.hl,bm:S.bm,notes:S.notes,fs:S.fs,vm:S.vm,b:S.b,c:S.c,cont:S.cont,para:S.para}))}catch(e){}};
-function layout(){$('.shell').classList.toggle('hs',S.sel!==null&&S.tab==='read'&&!S.rc);$('.shell').classList.toggle('para',!!(S.para&&S.tab==='read'));$('.shell').classList.toggle('two',!!(S.lc&&S.rc&&S.tab==='read'&&innerWidth>900))}
+function layout(){$('.shell').classList.toggle('hs',S.sel!==null&&S.tab==='read'&&!S.rc);$('.shell').classList.toggle('para',!!(S.para&&S.tab==='read'));$('.shell').classList.toggle('two',!!(S.lc&&S.rc&&!S.il&&S.tab==='read'&&innerWidth>900))}
 let LK='',DT;const SC={};
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
 if(!S.items.some(i=>i.id===S.ver)){const f=S.items.find(i=>i.kind==='tr');S.ver=f?f.id:null}
@@ -512,7 +525,7 @@ async function shareApp(){
  const c=()=>m.remove();m.onclick=e=>{if(e.target===m)c()};m.querySelector('#shcl').onclick=c}
 function topbar(){
  const t=$('#tp');
- if(S.tab==='read')t.innerHTML=`<h2 id="ttl" class="ttl">${BOOKS[S.b].n} ${S.c}</h2><button class="ibt tmb" id="tm" title="More options">⋯</button><div class="tx"><select class="sel" id="vs">${trs().map(i=>`<option value="${i.id}" ${i.id===S.ver?'selected':''}>${esc(i.name)}</option>`).join('')}</select><button class="btn ${S.para?'p':''}" id="pg" title="Paragraph reading" aria-pressed="${!!S.para}">¶</button><button class="btn" id="ct" title="Switch between chapter and whole-book reading" aria-pressed="${!!S.cont}">${S.cont?'Chapter':'Book'}</button><button class="btn" id="fd">A−</button><button class="btn" id="fu">A+</button></div>`;
+ if(S.tab==='read')t.innerHTML=`<h2 id="ttl" class="ttl">${BOOKS[S.b].n} ${S.c}</h2><button class="ibt tmb" id="tm" title="More options">⋯</button><div class="tx"><select class="sel" id="vs">${trs().map(i=>`<option value="${i.id}" ${i.id===S.ver?'selected':''}>${esc(i.name)}</option>`).join('')}</select>${act()?`<button class="btn ${S.il?'p':''}" id="bil" title="Hebrew–Greek interlinear" aria-label="Hebrew–Greek interlinear" aria-pressed="${!!S.il}">${ic('ao')}</button>`:''}<button class="btn ${S.para?'p':''}" id="pg" title="Paragraph reading" aria-pressed="${!!S.para}">¶</button><button class="btn" id="ct" title="Switch between chapter and whole-book reading" aria-pressed="${!!S.cont}">${S.cont?'Chapter':'Book'}</button><button class="btn" id="fd">A−</button><button class="btn" id="fu">A+</button></div>`;
  else if(S.tab==='lib')t.innerHTML=`<h2>Bibles & More</h2><button class="btn p" onclick="$('#fi').click()">Add files</button>`;
  else if(S.tab==='ex')t.innerHTML=S.exOpen?`<h2>${esc(exTitle())}</h2><button class="btn" id="exb">All texts</button><button class="btn" id="fd">A−</button><button class="btn" id="fu">A+</button>`:`<h2>Extra-Biblical</h2><button class="btn p" onclick="$('#fi').click()">Add texts</button>`;
  else t.innerHTML=`<h2>${TITLES[S.tab]}</h2>`;
@@ -520,7 +533,8 @@ function topbar(){
  if(S.tab==='read'||(S.tab==='ex'&&S.exOpen))t.insertAdjacentHTML('beforeend','<button class="ibt" id="tg2" title="Toggle side panel">'+ic('pr')+'</button>');
  if($('#exb'))$('#exb').onclick=()=>{S.exOpen=null;render()};
  $('#tl').onclick=()=>{S.lc=!S.lc;$('.shell').classList.toggle('lc',S.lc);layout()};
- if($('#tg2'))$('#tg2').onclick=()=>{S.rc=!S.rc;$('#rp').classList.toggle('c',S.rc);layout()};
+ if($('#tg2'))$('#tg2').onclick=()=>{if(S.il){ilClose(true);return}S.rc=!S.rc;$('#rp').classList.toggle('c',S.rc);layout()};
+ if($('#bil'))$('#bil').onclick=()=>S.il?ilClose():ilOpen();
  if($('#ttl'))$('#ttl').onclick=()=>{if(innerWidth<=900){S.sel=null;S.rc=!S.rc;render()}};
  if($('#tm'))$('#tm').onclick=()=>{S.tx=!S.tx;t.classList.toggle('xo',S.tx)};
  t.classList.toggle('xo',!!S.tx);if(S.tab!=='read')t.classList.remove('hide');
@@ -634,7 +648,7 @@ function lib(){
  ${srcCard()}
  <h3>${list.length} translation${list.length===1?'':'s'}</h3>
  ${list.length?list.map(i=>`<div class="item"><div class="spine">${esc(abbr(i.name))}</div><div class="m"><div>${esc(i.name)}</div><small>${vcount(i).toLocaleString()} verses · ${fmt(i.size)}</small></div>${S.ver===i.id?'<span class="tag a">Active</span>':`<button class="btn" data-use="${i.id}">Use</button>`}<button class="btn" data-del="${i.id}" title="Remove">${ic('x')}</button></div>`).join(''):'<div class="empty">No translations yet. Add your first one above.</div>'}
- <h3>More</h3><div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:16px"><div><div style="font-size:19px">Extra-biblical texts</div><small style="color:var(--muted)">Apocrypha, early writings, commentaries and devotionals have their own shelf.</small></div><button class="btn" id="goex">Open shelf</button></div></div></div>`}
+ ${ilCard()}<h3>More</h3><div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:16px"><div><div style="font-size:19px">Extra-biblical texts</div><small style="color:var(--muted)">Apocrypha, early writings, commentaries and devotionals have their own shelf.</small></div><button class="btn" id="goex">Open shelf</button></div></div></div>`}
 function ex(){
  if(S.exOpen){const secs=EX[S.exOpen]||[],n=secs.length,i=Math.max(0,Math.min(S.exSec,n-1)),s=secs[i];S.exSec=i;
   return `<div class="scroll" id="sc"><div class="col ex"><div class="chap">${lamb(90)}<small style="margin-top:12px">${esc(exTitle())}</small><h1 style="font-size:38px">${esc(s?s.t:'')}</h1></div><div class="orn"><i></i><b></b><i></i></div>${s?s.h:''}<div class="pn"><button class="btn" id="xp" aria-label="Previous section" ${i?'':'disabled style="opacity:.4"'}>${ic('l')}</button><span style="color:var(--muted);align-self:center">${i+1} / ${n}</span><button class="btn" id="xn" ${i<n-1?'':'disabled style="opacity:.4"'}>Next</button></div></div></div><div class="rp ${S.rc?'c':''}" id="rp"><h3 style="margin-top:0">Contents</h3>${secs.map((x,j)=>`<button class="bk ${j===i?'on':''}" data-s="${j}" style="padding-left:${6+(x.d||0)*14}px${x.d?';font-size:.92em':''}">${esc(x.t)}</button>`).join('')}</div>`}
@@ -656,7 +670,7 @@ async function loadManifest(){const u=$('#su').value.trim();if(!u)return;try{loc
  if(!/\.json(\?|$)/i.test(u)&&cands(u).length===1)return fetchSrc(u,decodeURIComponent(u.split('?')[0].split('/').pop().replace(/\.[^.]+$/,''))||'Translation');
  S.srcErr='';toast('Loading list…');try{S.catalog=await fetchCatalog(u);toast(S.catalog.length+' available to download')}catch(e){S.srcErr=e.message}render()}
 const srcCard=()=>`<h3>Download from your source</h3><div class="card"><div class="search" style="margin:0 0 10px">${ic('up')}<input id="su" placeholder="Link to a list (.json) or a single file" value="${esc(srcGet())}"></div><button class="btn p" id="sl">Load</button>${S.srcErr?`<div class="note">${esc(S.srcErr)}</div>`:''}${(S.catalog||[]).map((c,i)=>{const have=S.items.some(x=>x.name===c.name.replace(/_+/g,' ').trim());return `<div class="row2"><span>${esc(c.name)}</span><button class="btn" data-dl="${i}" ${have?'disabled style="opacity:.5"':''}>${have?'Added':'Download'}</button></div>`}).join('')}</div>`;
-function bindLib(){
+function bindLib(){ilBindLib();
  document.querySelectorAll('[data-use]').forEach(b=>b.onclick=()=>{S.ver=b.dataset.use;toast('Active translation updated');render()});
  document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const id=b.dataset.del;delete DB[id];delete EX[id];idbDel(id);idbDel('ex:'+id);S.items=S.items.filter(i=>i.id!==id);if(S.ver===id){const f=S.items.find(i=>i.kind==='tr');S.ver=f?f.id:null}if(S.exOpen===id)S.exOpen=null;save();render()});
  document.querySelectorAll('[data-read]').forEach(b=>b.onclick=()=>openEx(b.dataset.read));
@@ -673,7 +687,7 @@ async function ingest(files,kind){
   if(!['epub','txt','md','markdown','html','htm'].includes(ext)){toast('“'+f.name+'” isn’t supported. Please use EPUB, TXT, Markdown or HTML (Kindle files and PDFs need converting to EPUB first).');continue}
   toast('Reading “'+base+'”… this can take a few seconds');
   try{
-   if(kind==='tr'){const b=await importBible(f);
+   if(kind==='tr'){const zi=ext==='epub'?await ilLooks(f):null;if(zi){await ilImport(f,zi);continue}const b=await importBible(f);
     if(b){DB[it.id]=b;const ok=await idbSet(it.id,b);it.verses=vcount(it);S.items.push(it);if(!act())S.ver=it.id;save();render();toast('Added “'+base+'” with '+it.verses.toLocaleString()+' verses'+(ok?'':' (could not be saved on this device)'));continue}
     toast('No Bible structure found. Adding it to Extra-Biblical instead.');it.kind='ex'}
    const secs=await importText(f,ext);if(!secs||!secs.length)throw 0;
@@ -1022,10 +1036,69 @@ function socBindR(){
   const bg=e.target.closest('[data-bk]');if(bg){socBookGet(bg.dataset.bk);return}const bs=e.target.closest('[data-bstop]');if(bs){socBookStop(bs.dataset.bstop);return}
   const a=e.target.closest('.rf');if(!a)return;const[b,c,v]=a.dataset.r.split('.').map(Number);if(!(b>=0&&b<66&&c>=1&&c<=BC[b]))return;S.b=b;S.c=c;S.sel=v||null;S.ex2=[];S.tab='read';render()}}
 
+
+/* ===== interlinear Hebrew/Greek panel ===== */
+const IL={cache:{},busy:{},t:true,s:true,sy:0,key:''};
+try{const p=JSON.parse(localStorage.getItem('bib-ilopt')||'{}');if('t' in p)IL.t=!!p.t;if('s' in p)IL.s=!!p.s}catch(e){}
+// If the interlinear JSON files are hosted (see INTERLINEAR_HOSTING.md) the panel loads them automatically.
+const IL_BASE='https://sanctificae-dev.github.io/Bible-translations/interlinear/';
+const ilFile=b=>'b'+String(b+1).padStart(2,'0')+'.json',ilOk=d=>Array.isArray(d)&&d.length>0&&Array.isArray(d[0]);
+async function ilLoad(b){if(IL.busy[b])return;IL.busy[b]=1;let d;try{d=await idbGet('il:'+b)}catch(e){}
+ if(!ilOk(d)){d=null;try{const r=await fetch(IL_BASE+ilFile(b));if(r.ok){const j=await r.json();if(ilOk(j)){d=j;idbSet('il:'+b,j)}}}catch(e){}}
+ IL.cache[b]=d;IL.busy[b]=0;if(S.tab==='read'&&S.il&&S.b===b){IL.key='';ilRefresh()}}
+const evHtml=e=>esc(e||'').replace(/&lt;(\/?)i&gt;/g,'<$1i>');
+function ilHtml(){const b=S.b,d=IL.cache[b],he=b<39;
+ let h=`<div class="iph"><b>Interlinear</b><small>${esc(BOOKS[b].n)} ${S.c}</small><span class="sp"></span><button class="ibt" id="ilx" aria-label="Close interlinear" title="Close">${ic('x')}</button></div>`;
+ if(d===undefined){ilLoad(b);return h+'<div class="empty">Loading…</div>'}
+ if(!d)return h+`<div class="empty" style="padding:28px 18px">The Hebrew–Greek interlinear isn’t installed yet.<div class="note" style="justify-content:center;margin-top:10px"><span>Add the interlinear EPUB in Bibles &amp; More and it will open here beside whatever you’re reading.</span></div><br><button class="btn p" id="ilgo">Open Bibles &amp; More</button></div>`;
+ const ch=d[S.c-1]||[];
+ h+=`<div class="ilo"><label><input type="checkbox" id="ilt" ${IL.t?'checked':''}> Transliteration</label>${he?'':`<label><input type="checkbox" id="ils" ${IL.s?'checked':''}> Strong’s</label>`}</div>`;
+ if(!ch.length)return h+'<div class="empty">No interlinear text for this chapter.</div>';
+ const sel=S.sel!==null?selv():[];
+ return h+ch.map((vv,i)=>{if(!vv)return '';const v=i+1,ws=vv[1]||[];
+  return `<div class="ilv ${he?'he':''} ${sel.includes(v)?'on':''}" data-iv="${v}"><div class="ven"><b>${v}</b>${evHtml(vv[0])}</div>${ws.length?`<div class="wl">${ws.map(w=>`<span class="wd"><span class="wo" lang="${he?'he':'grc'}">${esc(w[0])}</span>${IL.t?`<span class="wt">${esc(w[1])}</span>`:''}<span class="wg">${esc(w[2])}</span>${!he&&IL.s&&w[3]?`<span class="ws">G${esc(w[3])}</span>`:''}</span>`).join('')}</div>`:'<div class="ven" style="color:var(--muted)">No original-language text for this verse in the source.</div>'}</div>`}).join('')}
+function ilBind(){const ip=$('#ip');if(!ip)return;
+ if($('#ilx'))$('#ilx').onclick=()=>ilClose();
+ if($('#ilgo'))$('#ilgo').onclick=()=>{S.tab='lib';render()};
+ const opt=()=>{try{localStorage.setItem('bib-ilopt',JSON.stringify({t:IL.t,s:IL.s}))}catch(e){}};
+ if($('#ilt'))$('#ilt').onchange=e=>{IL.t=e.target.checked;opt();ilRefresh(true)};
+ if($('#ils'))$('#ils').onchange=e=>{IL.s=e.target.checked;opt();ilRefresh(true)};
+ ip.querySelectorAll('[data-iv]').forEach(c=>c.onclick=()=>{S.sel=+c.dataset.iv;S.ex2=[];render()});
+ const k=S.b+'.'+S.c+'.'+S.sel,on=ip.querySelector('.ilv.on');
+ if(k===IL.key)ip.scrollTop=IL.sy;else if(on&&on.scrollIntoView)on.scrollIntoView({block:'nearest'});IL.key=k}
+function ilRefresh(keep){const ip=$('#ip');if(!ip)return;const y=ip.scrollTop;ip.innerHTML=ilHtml();ilBind();if(keep&&$('#ip'))$('#ip').scrollTop=y}
+function ilOpen(){S.rcPrev=S.rc;S.rc=true;S.il=true;render()}
+function ilClose(openSide){S.il=false;S.rc=openSide?false:!!S.rcPrev;render()}
+const dtx=document.createElement('textarea'),dec=s=>{s=s.replace(/<[^>]+>/g,'');if(s.indexOf('&')<0)return s.trim();dtx.innerHTML=s;return dtx.value.trim()};
+function ilParse(s){const out=[],re=/<div class="v" id="v\d+_(\d+)">([\s\S]*?)<\/div>/g;let m;
+ while((m=re.exec(s))){const body=m[2],en=/<p class="en">([\s\S]*?)<\/p>/.exec(body),il=/<p class="il">([\s\S]*?)<\/p>/.exec(body);
+  let e=en?en[1]:'';e=e.replace(/<span class="n">[\s\S]*?<\/span>/,'').replace(/<span class="st">([\s\S]*?)<\/span>/g,'\u0002$1\u0003');e=dec(e).replace(/\u0002/g,'<i>').replace(/\u0003/g,'</i>');
+  const ws=[];if(il){const wr=/<span class="w"><span class="o"[^>]*>([\s\S]*?)<\/span><span class="t">([\s\S]*?)<\/span><span class="g">([\s\S]*?)<\/span>(?:<span class="s">([\s\S]*?)<\/span>)?<\/span>/g;let w;
+   while((w=wr.exec(il[1]))){const a=[dec(w[1]),dec(w[2]),dec(w[3])];if(w[4])a.push(dec(w[4]).replace(/^G/,''));ws.push(a)}}
+  out[+m[1]-1]=[e,ws]}
+ for(let i=0;i<out.length;i++)if(!out[i])out[i]=['',[]];return out}
+async function ilLooks(f){try{const z=await JSZip.loadAsync(f);const n=Object.keys(z.files);return n.some(x=>/(^|\/)b01c001\.xhtml$/.test(x))&&n.some(x=>/(^|\/)b66c022\.xhtml$/.test(x))?z:null}catch(e){return null}}
+async function ilImport(file,zip){
+ try{toast('Reading the interlinear…');const z=zip||await JSZip.loadAsync(file),byB={};
+  Object.keys(z.files).forEach(n=>{const m=/(^|\/)b(\d\d)c(\d\d\d)\.xhtml$/.exec(n);if(m)(byB[+m[2]-1]=byB[+m[2]-1]||[]).push([+m[3],n])});
+  if(Object.keys(byB).length!==66)throw new Error('layout');let verses=0,words=0;
+  for(let b=0;b<66;b++){const ch=[];for(const [c,n] of byB[b].sort((x,y)=>x[0]-y[0]))ch[c-1]=ilParse(await z.files[n].async('string'));
+   if(!ch.length||ch.some(x=>!x||!x.length))throw new Error('layout');ch.forEach(c=>{verses+=c.length;c.forEach(v=>words+=v[1].length)});await idbSet('il:'+b,ch);if(b%11===10)toast('Importing interlinear… '+(b+1)+' of 66 books')}
+  if(verses<30000)throw new Error('layout');
+  IL.cache={};IL.busy={};try{localStorage.setItem('bib-ilinfo',JSON.stringify({books:66,verses,words,ts:Date.now()}))}catch(e){}
+  toast('Interlinear added: '+verses.toLocaleString()+' verses');if(S.tab==='lib'||S.tab==='read')render()}
+ catch(e){toast(String(e&&e.message)==='layout'?'That doesn’t look like the Hebrew–Greek interlinear EPUB.':'Couldn’t read that file')}}
+async function ilRemove(){for(let b=0;b<66;b++)await idbDel('il:'+b);IL.cache={};IL.busy={};try{localStorage.removeItem('bib-ilinfo')}catch(e){}toast('Interlinear removed from this device');render()}
+const ilInfo=()=>{try{return JSON.parse(localStorage.getItem('bib-ilinfo')||'null')}catch(e){return null}};
+const ilCard=()=>{const i=ilInfo();return `<h3>Interlinear</h3><div class="card"><div style="font-size:19px">Hebrew–Greek interlinear</div><div class="note" style="margin:6px 0 12px"><span>${i?'Installed on this device ('+i.books+' books, '+(i.words||0).toLocaleString()+' words). Open it from the '+'אΩ'+' button in the Reader.':'Not installed here yet. Import the interlinear EPUB once and it stays on this device, ready beside whatever you’re reading. If a copy is hosted for Abide, it loads automatically instead.'}</span></div><div class="srow"><button class="btn p" id="ilimp">${i?'Replace from EPUB…':'Import interlinear EPUB'}</button>${i?'<button class="btn" id="ilrm">Remove</button>':''}</div></div>`};
+function ilBindLib(){let fi=$('#fil');if(!fi){fi=document.createElement('input');fi.type='file';fi.id='fil';fi.accept='.epub';fi.hidden=true;fi.onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)ilImport(f)};document.body.appendChild(fi)}
+ if($('#ilimp'))$('#ilimp').onclick=()=>fi.click();if($('#ilrm'))$('#ilrm').onclick=()=>ilRemove()}
 function render(){try{localStorage.setItem('bib-ver',S.ver)}catch(e){}
+{const o=document.getElementById('ip');IL.sy=o?o.scrollTop:0}
  side();topbar();$('.shell').classList.toggle('lc',!!S.lc);layout();
  const o=$('#bd .scroll'),ot=o?o.scrollTop:0,k=S.tab+'|'+S.b+'|'+(S.cont?'c':S.c)+'|'+S.cont+'|'+S.exOpen+'|'+S.exSec;persist();if(k!==LK)S.ex2=[];
  $('#bd').innerHTML=({read:reader,search,marks,plan,lib,ex,gh:words,soc:social,set:settings})[S.tab]();
+ if(S.tab==='read'&&S.il&&act()){$('#bd').insertAdjacentHTML('beforeend','<div class="ip" id="ip">'+ilHtml()+'</div>');ilBind()}
  const n=$('#bd .scroll');if(n){if(k===LK)n.scrollTop=ot;else{const e=n.querySelector('.v.picked');if(e)e.scrollIntoView({block:'center'});else if(S.cont){const c=$('#ch'+S.c);if(c)c.scrollIntoView()}}}LK=k;if(S.jump){const c=$('#ch'+S.jump);if(c)c.scrollIntoView();S.jump=0}
  if($('#go'))$('#go').onclick=()=>{S.tab='lib';render()};
  if(S.tab==='search'){const q=$('#q');q.value=S.q||'';q.oninput=()=>{S.q=q.value;clearTimeout(DT);DT=setTimeout(doSearch,150)};doSearch()}
